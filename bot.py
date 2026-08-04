@@ -10,6 +10,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
 async def on_ready():
     print(f'Бот {bot.user} готов!')
+    await bot.load_extension('ProfileCog') 
 
 @bot.command()
 async def hello(ctx):
