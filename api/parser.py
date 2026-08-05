@@ -15,7 +15,8 @@ def get_player_json(url: str) -> dict | None:
         return None
 
 if __name__ == "__main__":
-    url = "https://eternal-gores.com/api/profiles/by-nick/ZнdyyR"
+    # url = "https://eternal-gores.com/api/profiles/by-nick/ZнdyyR"
+    url = "https://eternal-gores.com/api/profiles/by-nick/axech"
     result = get_player_json(url)
     if result:
-        print(result["nick"])
+        print(result["clan"])

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class DifficultyStats:
+class DifficultyCounter:
     easy: int
     main: int
     hard: int

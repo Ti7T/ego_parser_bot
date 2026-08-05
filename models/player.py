@@ -1,15 +1,15 @@
 from dataclasses import dataclass
-from DifficultyStats import DifficultyStats
-from Clan import Clan
+from .difficulty import DifficultyCounter
+from .clan import Clan
 
 @dataclass
-class PlayerStats:
+class Player:
     nick: str
     clan: Clan
     points: int
     total_finished_maps: int
 
-    counts: DifficultyStats
-    counts_total: DifficultyStats
+    counts: DifficultyCounter
+    counts_total: DifficultyCounter
 
     best_teammates: list[str]
