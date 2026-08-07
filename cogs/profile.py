@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from api import get_player_json, JSONConverter
-from presentation import create_profile_embed
+from templates.template_creator import profile_image_create
 
 class ProfileCog(commands.Cog):
     def __init__(self, bot):
@@ -20,10 +20,12 @@ class ProfileCog(commands.Cog):
         interaction: discord.Interaction,
         nick: str
     ):
-        data = get_player_json(f"https://eternal-gores.com/api/profiles/by-nick/{nick}")
-        player = JSONConverter.to_player(data)
-        embed = create_profile_embed(player)
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.defer(ephemeral=True, thinking=True)
+        
+        
+        image_bytes_io = profile_image_create(player)
+        file = discord.File(fp=image_bytes_io, filename="profile.png")
+        await interaction.followup.send(file=file, ephemeral=True)
     
     # @commands.command()
     # async def profile(self, ctx, name):

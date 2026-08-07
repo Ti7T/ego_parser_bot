@@ -7,7 +7,10 @@ class Player:
     nick: str
     clan: Clan
     points: int
+    rank: int
     total_finished_maps: int
+
+    avatar_url: str
 
     counts: DifficultyCounter
     counts_total: DifficultyCounter
