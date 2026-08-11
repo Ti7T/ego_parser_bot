@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from api import get_player_json, JSONConverter
-from templates.template_creator import profile_image_create
+from services import create_profile, get_player
 
 class ProfileCog(commands.Cog):
     def __init__(self, bot):
@@ -21,10 +20,12 @@ class ProfileCog(commands.Cog):
         nick: str
     ):
         await interaction.response.defer(ephemeral=True, thinking=True)
-        
-        
-        image_bytes_io = profile_image_create(player)
-        file = discord.File(fp=image_bytes_io, filename="profile.png")
+        player = await get_player(nick)
+        image = await create_profile(player)
+        file = discord.File(
+            fp=image, 
+            filename="profile.png"
+        )
         await interaction.followup.send(file=file, ephemeral=True)
     
     # @commands.command()

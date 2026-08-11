@@ -1,10 +1,13 @@
 import aiohttp
 import asyncio
 from config import BASE_URL, APIEndpoints
+import base64
+from api import client
 
-async def get_player_json(nick: str, session: aiohttp.ClientSession) -> dict | None:
+async def get_player_json(nick: str) -> dict | None:
     try:
-        async with session.get(f"{BASE_URL}{APIEndpoints.PROFILE_BY_NICK.format(nick)}") as response:
+        session = client.http_session
+        async with session.get(f"{BASE_URL}{APIEndpoints.PROFILE_BY_NICK.format(nick=nick)}") as response:
             response.raise_for_status()
             return await response.json()
     except aiohttp.ClientResponseError as e:
@@ -26,6 +29,15 @@ async def get_player_json(nick: str, session: aiohttp.ClientSession) -> dict | N
         # Любые другие ошибки
         print(f"Unexpected error: {e}")
         return None
+
+async def url_to_base64_async(url: str) -> str:
+    session = client.http_session
+    async with session.get(url) as response:
+        response.raise_for_status()
+        content_type = response.headers.get('content-type', 'image/png')
+        data = await response.read()
+        b64 = base64.b64encode(data).decode()
+        return f"data:{content_type};base64,{b64}"
 
 async def main():
     try:
