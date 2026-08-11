@@ -4,7 +4,7 @@ from PIL import ImageFont
 from config import BASE_URL
 from templates import load_template
 from typing import Any
-import cairosvg
+import resvg_py
 from io import BytesIO
 
 async def get_player(nick : str) -> Player:
@@ -17,8 +17,8 @@ async def create_profile(player: Player):
     svg = template.render(**data)
     # with open("debug.svg", "w", encoding="utf-8") as f:
     #     f.write(svg)
-    png_bytes = cairosvg.svg2png(
-        bytestring=svg.encode('utf-8'),
+    png_bytes = resvg_py.svg_to_bytes(
+        svg_string=svg
     )
     return BytesIO(png_bytes)
 
@@ -68,6 +68,10 @@ async def make_template_data(player: Player) -> dict[str, Any]:
         "nick": player.nick,
         "rank": player.rank,
         "points": player.points,
+        "clan": {
+            "name" : player.clan.name,
+            "avatar_url" : await url_to_base64_async(player.clan.avatar_url)
+        },
         "avatar_url": await url_to_base64_async(player.avatar_url),
         "categories": categories,
         "teammates": teammates,

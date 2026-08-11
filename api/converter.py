@@ -21,11 +21,11 @@ class JSONConverter:
         )
 
     @staticmethod
-    def _to_clan(data: dict) -> Clan:
+    def _to_clan(data: dict, api_url : str) -> Clan:
         return Clan(
             id=data["id"],
             name=data["name"],
-            avatar_url=data["avatar_url"]
+            avatar_url=data["avatar_url"] if is_absolute(data["avatar_url"]) else api_url+data["avatar_url"]
         )
 
     @staticmethod
@@ -33,7 +33,7 @@ class JSONConverter:
         return Player(
             nick=data["nick"],
             #clan=data.get("clan"),
-            clan=JSONConverter._to_clan(data["clan"]) if data["clan"] else None,
+            clan=JSONConverter._to_clan(data["clan"], api_url) if data["clan"] else None,
             points=data["points"],
             rank=data["rank"],
             total_finished_maps=data["total_finished_maps"],
