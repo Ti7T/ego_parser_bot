@@ -19,6 +19,27 @@ class ProfileCog(commands.Cog):
         interaction: discord.Interaction,
         nick: str
     ):
+        await interaction.response.defer(thinking=True)
+        player = await get_player(nick)
+        image = await create_profile(player)
+        file = discord.File(
+            fp=image, 
+            filename="profile.png"
+        )
+        await interaction.followup.send(file=file)
+
+    @app_commands.command(
+        name="profile",
+        description="Показать невидимую для остальных кроме вас статистику игрока на EGO серверах"
+    )
+    @app_commands.describe(
+        nick="Ник игрока на EGO"
+    )
+    async def private_profile(
+        self,
+        interaction: discord.Interaction,
+        nick: str
+    ):
         await interaction.response.defer(ephemeral=True, thinking=True)
         player = await get_player(nick)
         image = await create_profile(player)
