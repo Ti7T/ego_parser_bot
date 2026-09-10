@@ -29,7 +29,7 @@ class ProfileCog(commands.Cog):
         await interaction.followup.send(file=file)
 
     @app_commands.command(
-        name="profile",
+        name="private_profile",
         description="Показать невидимую для остальных кроме вас статистику игрока на EGO серверах"
     )
     @app_commands.describe(
