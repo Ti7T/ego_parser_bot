@@ -6,6 +6,11 @@ from templates import load_template
 from typing import Any
 import resvg_py
 from io import BytesIO
+from pathlib import Path
+import base64
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+FONT_PATH = BASE_DIR / "fonts" / "Inter.ttf"
 
 async def get_player(nick : str) -> Player:
     data = await get_player_json(nick)
@@ -14,7 +19,13 @@ async def get_player(nick : str) -> Player:
 async def create_profile(player: Player):
     template = load_template("profile.svg")
     data = await make_template_data(player)
-    svg = template.render(**data)
+    font_base64 = base64.b64encode(
+        FONT_PATH.read_bytes()
+    ).decode("ascii")
+    svg = template.render(
+        **data,
+        font_base64=font_base64
+    )
     # with open("debug.svg", "w", encoding="utf-8") as f:
     #     f.write(svg)
     png_bytes = resvg_py.svg_to_bytes(
@@ -27,8 +38,8 @@ async def make_template_data(player: Player) -> dict[str, Any]:
     categories = []
     # Список полей в том же порядке, что и в SVG (Easy, Main, Hard, Insane, Extreme, Jet, Solo, Mods)
     difficulty_fields = ["easy", "main", "hard", "insane", "extreme", "jet", "solo", "mods"]
-    font_nick = ImageFont.truetype("segoeui.ttf", 42)   # размер как в SVG
-    font_points = ImageFont.truetype("segoeui.ttf", 30)
+    font_nick = ImageFont.truetype(FONT_PATH, 42)   # размер как в SVG
+    font_points = ImageFont.truetype(FONT_PATH, 30)
 
     # Для красоты можно сохранить названия с большой буквы (как в интерфейсе)
     display_names = {
