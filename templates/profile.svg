@@ -17,11 +17,6 @@
   </defs>
 
   <style>
-    @font-face {
-      font-family: 'Inter';
-      src: url(data:font/ttf;base64,{{ font_base64 }});
-    }
-
     text {
       font-family: 'Inter';
     }

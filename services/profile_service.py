@@ -7,7 +7,6 @@ from typing import Any
 import resvg_py
 from io import BytesIO
 from pathlib import Path
-import base64
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 FONT_PATH = BASE_DIR / "fonts" / "Inter.ttf"
@@ -19,12 +18,9 @@ async def get_player(nick : str) -> Player:
 async def create_profile(player: Player):
     template = load_template("profile.svg")
     data = await make_template_data(player)
-    font_base64 = base64.b64encode(
-        FONT_PATH.read_bytes()
-    ).decode("ascii")
     svg = template.render(
         **data,
-        font_base64=font_base64
+        font_files=[str(FONT_PATH)]
     )
     # with open("debug.svg", "w", encoding="utf-8") as f:
     #     f.write(svg)
