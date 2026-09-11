@@ -18,14 +18,12 @@ async def get_player(nick : str) -> Player:
 async def create_profile(player: Player):
     template = load_template("profile.svg")
     data = await make_template_data(player)
-    svg = template.render(
-        **data,
-        font_files=[str(FONT_PATH)]
-    )
+    svg = template.render(**data)
     # with open("debug.svg", "w", encoding="utf-8") as f:
     #     f.write(svg)
     png_bytes = resvg_py.svg_to_bytes(
-        svg_string=svg
+        svg_string=svg,
+        font_files=[str(FONT_PATH)]
     )
     return BytesIO(png_bytes)
 
