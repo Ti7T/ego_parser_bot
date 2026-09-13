@@ -74,9 +74,9 @@ async def make_template_data(player: Player) -> dict[str, Any]:
         "rank": player.rank,
         "points": player.points,
         "clan": {
-            "name" : player.clan.name,
-            "avatar_url" : await url_to_base64_async(player.clan.avatar_url)
-        },
+            "name": player.clan.name,
+            "avatar_url": await url_to_base64_async(player.clan.avatar_url)
+        } if player.clan else None,
         "avatar_url": await url_to_base64_async(player.avatar_url),
         "categories": categories,
         "teammates": teammates,

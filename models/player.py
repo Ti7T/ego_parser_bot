@@ -5,7 +5,7 @@ from .clan import Clan
 @dataclass
 class Player:
     nick: str
-    clan: Clan
+    clan: Clan | None
     points: int
     rank: int
     total_finished_maps: int
