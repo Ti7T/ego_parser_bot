@@ -5,9 +5,15 @@ import base64
 from api import client
 
 async def get_player_json(nick: str) -> dict | None:
+    return await parse_url(APIEndpoints.PROFILE_BY_NICK.format(nick=nick))
+
+async def get_player_playtime_json(nick: str) -> dict | None:
+    return await parse_url(APIEndpoints.PLAYTIME_BY_NICK.format(nick=nick))
+
+async def parse_url(endpoint: str) -> dict | None:
     try:
         session = client.http_session
-        async with session.get(f"{BASE_URL}{APIEndpoints.PROFILE_BY_NICK.format(nick=nick)}") as response:
+        async with session.get(f"{BASE_URL}{endpoint}") as response:
             response.raise_for_status()
             return await response.json()
     except aiohttp.ClientResponseError as e:

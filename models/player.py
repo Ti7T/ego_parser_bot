@@ -16,3 +16,4 @@ class Player:
     counts_total: DifficultyCounter
 
     best_teammates: list[str]
+    total_playtime: int

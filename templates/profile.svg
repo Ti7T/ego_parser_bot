@@ -89,6 +89,20 @@
       fill: #ffffff;
       letter-spacing: 0.02em;
     }
+    .playtime {
+      font-weight: 800;
+      font-size: 32px;
+      fill: #ff4d57;
+      letter-spacing: 0.01em;
+    }
+
+    .playtime-label {
+      font-weight: 600;
+      font-size: 20px;
+      fill: #999999;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
   </style>
 
   <!-- Фон и рамка -->
@@ -120,12 +134,18 @@
     <text x="190" y="160" filter="url(#textShadow)">
       <tspan class="points">{{ points }}</tspan>
       <tspan class="points-label" dx="12">POINTS</tspan>
+      
+      <tspan class="playtime" dx="35">{{ playtime }}</tspan>
+      <tspan class="playtime-label" dx="12">HOURS</tspan>
     </text>
   {% else %}
     <!-- Без клана – точки на той же высоте, что и раньше -->
     <text x="190" y="120" filter="url(#textShadow)">
       <tspan class="points">{{ points }}</tspan>
       <tspan class="points-label" dx="12">POINTS</tspan>
+      
+      <tspan class="playtime" dx="35">{{ playtime }}</tspan>
+      <tspan class="playtime-label" dx="12">HOURS</tspan>
     </text>
   {% endif %}
 
