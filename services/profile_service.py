@@ -1,4 +1,4 @@
-from api import get_player_json, JSONConverter, url_to_base64_async
+from api import get_player_json, JSONConverter, url_to_base64_async, get_player_playtime_json
 from models import Player
 from PIL import ImageFont
 from config import BASE_URL
@@ -7,12 +7,16 @@ from typing import Any
 import resvg_py
 from io import BytesIO
 from pathlib import Path
+# import json
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 FONT_PATH = BASE_DIR / "fonts" / "Inter.ttf"
 
 async def get_player(nick : str) -> Player:
     data = await get_player_json(nick)
+    data["playtime"] = await get_player_playtime_json(nick)
+    # with open("data.json", "w", encoding="utf-8") as f:
+    #     json.dump(data, f, ensure_ascii=False, indent=4)
     return JSONConverter.to_player(data, BASE_URL)
 
 async def create_profile(player: Player):
@@ -82,7 +86,8 @@ async def make_template_data(player: Player) -> dict[str, Any]:
         "teammates": teammates,
 
         "nick_width" : font_nick.getlength(player.nick),
-        "points_width" : font_points.getlength(str(player.points))
+        "points_width" : font_points.getlength(str(player.points)),
+        "playtime" : round(player.total_playtime / 3600, 1)
     }
     
     return data

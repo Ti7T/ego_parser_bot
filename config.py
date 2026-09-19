@@ -13,3 +13,4 @@ if not BASE_URL:
 
 class APIEndpoints:
     PROFILE_BY_NICK = "/api/profiles/by-nick/{nick}"
+    PLAYTIME_BY_NICK = "/api/players/{nick}/playtime"

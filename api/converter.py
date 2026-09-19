@@ -47,5 +47,6 @@ class JSONConverter:
                     avatar_url=t["avatar_url"] if is_absolute(t["avatar_url"]) else api_url+t["avatar_url"]
                 )
                 for t in data.get("best_teammates", [])
-            ]
+            ],
+            total_playtime=data["playtime"]["total_seconds"]
         )
