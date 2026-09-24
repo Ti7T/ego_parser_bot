@@ -19,19 +19,26 @@ async def get_player(nick : str) -> Player:
     #     json.dump(data, f, ensure_ascii=False, indent=4)
     return JSONConverter.to_player(data, BASE_URL)
 
-async def create_profile(player: Player):
-    template = load_template("profile.svg")
-    data = await make_template_data(player)
-    svg = template.render(**data)
-    # with open("debug.svg", "w", encoding="utf-8") as f:
-    #     f.write(svg)
+def svg_to_png(svg: str) -> BytesIO:
     png_bytes = resvg_py.svg_to_bytes(
         svg_string=svg,
-        font_files=[str(FONT_PATH)]
+        font_files=[str(FONT_PATH)],
     )
     return BytesIO(png_bytes)
 
-async def make_template_data(player: Player) -> dict[str, Any]:
+def render_svg(template_name: str, data: dict[str, Any]) -> str:
+    template = load_template(template_name)
+    return template.render(**data)
+
+async def create_profile(player: Player):
+    data = await make_profile_data(player)
+    svg = render_svg("profile.svg", data)
+    # with open("debug.svg", "w", encoding="utf-8") as f:
+    #     f.write(svg)
+    return svg_to_png(svg)
+
+
+async def make_profile_data(player: Player) -> dict[str, Any]:
     # 1. Категории: список словарей для каждого уровня сложности
     categories = []
     # Список полей в том же порядке, что и в SVG (Easy, Main, Hard, Insane, Extreme, Jet, Solo, Mods)
@@ -89,5 +96,55 @@ async def make_template_data(player: Player) -> dict[str, Any]:
         "points_width" : font_points.getlength(str(player.points)),
         "playtime" : round(player.total_playtime / 3600, 1)
     }
-    
+
     return data
+
+async def create_recent_finishes(
+    player: Player,
+) -> BytesIO:
+
+    data = await make_recent_finishes_data(player)
+    svg = render_svg("recent_finishes.svg", data)
+
+    return svg_to_png(svg)
+
+
+async def make_recent_finishes_data(
+    player: Player,
+) -> dict[str, Any]:
+
+    finishes = []
+
+    for record in player.activity_records[:10]:
+        finishes.append({
+            "map_name": record.map_name,
+            "time": record.time,
+            "rank": record.rank,
+            "points": record.points,
+            "difficulty": record.difficulty,
+            "stars": record.stars,
+            "is_team": record.is_team,
+            "is_solo_team": record.is_solo_team,
+            "is_refinish": record.is_refinish,
+            "finished_at": record.finished_at,
+        })
+
+    return {
+        "nick": player.nick,
+        "rank": player.rank,
+        "points": player.points,
+        "avatar_url": await url_to_base64_async(player.avatar_url),
+
+        "clan": (
+            {
+                "name": player.clan.name,
+                "avatar_url": await url_to_base64_async(
+                    player.clan.avatar_url
+                ),
+            }
+            if player.clan
+            else None
+        ),
+        "playtime" : round(player.total_playtime / 3600, 1),
+        "finishes": finishes,
+    }

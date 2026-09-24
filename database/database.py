@@ -37,6 +37,11 @@ def init_database() -> None:
                 guild_id INTEGER PRIMARY KEY,
                 channel_id INTEGER NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS linked_players (
+                user_id INTEGER PRIMARY KEY,
+                nick TEXT NOT NULL
+            );
         """)
 
 
@@ -209,4 +214,47 @@ def remove_command_channel(guild_id: int) -> None:
             WHERE guild_id = ?
             """,
             (guild_id,)
+        )
+
+# =========================
+# Привязка дискорда к нику
+# =========================
+def set_linked_player(user_id: int, nick: str) -> None:
+    with get_connection() as connection:
+        connection.execute(
+            """
+            INSERT INTO linked_players (user_id, nick)
+            VALUES (?, ?)
+            ON CONFLICT(user_id)
+            DO UPDATE SET nick = excluded.nick
+            """,
+            (user_id, nick)
+        )
+
+
+def get_linked_player(user_id: int) -> str | None:
+    with get_connection() as connection:
+        row = connection.execute(
+            """
+            SELECT nick
+            FROM linked_players
+            WHERE user_id = ?
+            """,
+            (user_id,)
+        ).fetchone()
+
+    if row is None:
+        return None
+
+    return row["nick"]
+
+
+def remove_linked_player(user_id: int) -> None:
+    with get_connection() as connection:
+        connection.execute(
+            """
+            DELETE FROM linked_players
+            WHERE user_id = ?
+            """,
+            (user_id,)
         )

@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from services import create_profile, get_player
+from typing import Optional
+from database import get_linked_player
 
 class ProfileCog(commands.Cog):
     def __init__(self, bot):
@@ -17,13 +19,23 @@ class ProfileCog(commands.Cog):
     async def profile(
         self,
         interaction: discord.Interaction,
-        nick: str
+        nick: Optional[str] = None
     ):
+        if nick is None:
+            nick = get_linked_player(interaction.user.id)
+            if nick is None:
+                await interaction.response.send_message(
+                    "❌ У тебя не привязан игровой ник.\n"
+                    "Используй `/link`, чтобы привязать его.",
+                    ephemeral=True
+                )
+                return
+
         await interaction.response.defer(thinking=True)
         player = await get_player(nick)
         image = await create_profile(player)
         file = discord.File(
-            fp=image, 
+            fp=image,
             filename="profile.png"
         )
         await interaction.followup.send(file=file)
@@ -38,33 +50,26 @@ class ProfileCog(commands.Cog):
     async def private_profile(
         self,
         interaction: discord.Interaction,
-        nick: str
+        nick: Optional[str] = None
     ):
+        if nick is None:
+            nick = get_linked_player(interaction.user.id)
+            if nick is None:
+                await interaction.response.send_message(
+                    "❌ У тебя не привязан игровой ник.\n"
+                    "Используй `/link`, чтобы привязать его.",
+                    ephemeral=True
+                )
+                return
+
         await interaction.response.defer(ephemeral=True, thinking=True)
         player = await get_player(nick)
         image = await create_profile(player)
         file = discord.File(
-            fp=image, 
+            fp=image,
             filename="profile.png"
         )
         await interaction.followup.send(file=file, ephemeral=True)
-    
-    # @commands.command()
-    # async def profile(self, ctx, name):
-    #     data = get_player_json(f"https://eternal-gores.com/api/profiles/by-nick/{name}")
-    #     player = JSONConverter.to_player(data)
-    #     embed = create_profile_embed(player)
-    #     await ctx.send(embed=embed)
-
-    # @profile.error
-    # async def profile_error(self, ctx, error):
-    #     if isinstance(error, commands.MissingRequiredArgument):
-    #         await ctx.send(
-    #             "❌ Вы не указали ник.\n"
-    #             "Использование: `!profile <ник>`"
-    #         )
-    #     else:
-    #         raise error
 
 # Функция "setup" обязательна для загрузки Кога
 async def setup(bot):
