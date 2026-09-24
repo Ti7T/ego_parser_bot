@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1000" height="780" viewBox="0 0 1000 780">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#18191d"/>
+      <stop offset="100%" stop-color="#101114"/>
+    </linearGradient>
+    <linearGradient id="avatarFallback" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2b2e35"/>
+      <stop offset="100%" stop-color="#1c1e23"/>
+    </linearGradient>
+    <filter id="textShadow" x="-10%" y="-20%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.32"/>
+    </filter>
+    <clipPath id="avatarClip"><rect x="40" y="40" width="120" height="120" rx="20"/></clipPath>
+    <symbol id="star" viewBox="0 0 32 32">
+      <path d="M16 2.6l3.85 7.8 8.61 1.25-6.23 6.07 1.47 8.58L16 22.26l-7.7 4.04 1.47-8.58-6.23-6.07 8.61-1.25L16 2.6z"/>
+    </symbol>
+  </defs>
+
+  <style>
+    text { font-family: 'Inter', 'Noto Sans', sans-serif; }
+    .eyebrow { font-weight:700; font-size:13px; fill:#ff4d57; letter-spacing:.16em; }
+    .title { font-weight:800; font-size:30px; fill:#fff; letter-spacing:-.025em; }
+    .count { font-weight:600; font-size:15px; fill:#858991; }
+    .nick { font-weight:800; font-size:44px; fill:#fff; letter-spacing:-.02em; }
+    .profile-rank { font-weight:700; font-size:26px; fill:#ff4d57; letter-spacing:.02em; }
+    .clan-name { font-weight:600; font-size:24px; fill:#fff; letter-spacing:.01em; }
+    .profile-points { font-weight:800; font-size:32px; fill:#ff4d57; letter-spacing:.01em; }
+    .profile-points-label { font-weight:600; font-size:20px; fill:#999; letter-spacing:.08em; }
+    .playtime { font-weight:800; font-size:32px; fill:#ff4d57; letter-spacing:.01em; }
+    .playtime-label { font-weight:600; font-size:20px; fill:#999; letter-spacing:.08em; }
+
+    .card { fill:#16181c; stroke:#2d2f35; stroke-width:1.2; }
+    .card-hover { fill:#1a1c21; opacity:.42; }
+    .map-name { font-weight:800; font-size:22px; fill:#fff; letter-spacing:-.02em; }
+    .map-name.long { font-size:20px; }
+
+    .difficulty { font-weight:800; font-size:10px; fill:currentColor; letter-spacing:.08em; }
+    .pill-text { font-weight:800; font-size:9px; fill:#e9ebef; letter-spacing:.08em; }
+
+    /* Более спокойная палитра: цвет — акцент, а не заливка всей карточки. */
+    .diff-easy { color:#72c69a; fill:#72c69a; }
+    .diff-main { color:#7ea9d8; fill:#7ea9d8; }
+    .diff-hard { color:#d6aa6d; fill:#d6aa6d; }
+    .diff-insane { color:#b894d6; fill:#b894d6; }
+    .diff-extreme { color:#df737c; fill:#df737c; }
+    .diff-solo { color:#69b9b8; fill:#69b9b8; }
+    .diff-jet { color:#9187cf; fill:#9187cf; }
+    .diff-mods { color:#c486ad; fill:#c486ad; }
+    .diff-other { color:#9297a1; fill:#9297a1; }
+
+    .diff-bg { fill:#24272d; stroke:currentColor; stroke-width:1; }
+    .mode-team { fill:#252126; stroke:#b76670; stroke-width:1; }
+    .mode-solo { fill:#22282a; stroke:#5b9c9a; stroke-width:1; }
+
+    .star { opacity:1; }
+    .star-empty { fill:#30333a; opacity:1; }
+    .time { font-weight:800; font-size:20px; fill:#fff; letter-spacing:-.02em; }
+    .rank { font-weight:600; font-size:12px; fill:#7d828c; }
+    .date { font-weight:500; font-size:10px; fill:#6f737c; letter-spacing:.02em; }
+    .points { font-weight:800; font-size:23px; fill:#ff4d57; letter-spacing:-.02em; }
+    .points.zero { fill:#9da1aa; }
+    .points-label { font-weight:700; font-size:9px; fill:#6f737c; letter-spacing:.12em; }
+    .refinish { font-weight:700; font-size:8px; fill:#8d929b; letter-spacing:.07em; }
+  </style>
+
+  <rect x="10" y="10" width="980" height="760" rx="24" fill="url(#bg)" stroke="#2d2d2d" stroke-width="1.5"/>
+
+  <!-- Header matched to profile.svg. -->
+  <rect x="40" y="40" width="120" height="120" rx="20" fill="url(#avatarFallback)"/>
+  {% if avatar_url %}
+    <image x="40" y="40" width="120" height="120"
+           href="{{ avatar_url }}" xlink:href="{{ avatar_url }}"
+           preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)"/>
+  {% endif %}
+  <rect x="40" y="40" width="120" height="120" rx="20" fill="none" stroke="#ff4d57" stroke-width="2.5"/>
+  {% if not avatar_url %}
+    <text x="100" y="113" text-anchor="middle" style="font-weight:800;font-size:28px;fill:#777d88;">?</text>
+  {% endif %}
+
+  <text x="190" y="80" filter="url(#textShadow)">
+    <tspan class="nick">{{ nick }}</tspan>
+    <tspan class="profile-rank" dx="18">#{{ rank }}</tspan>
+  </text>
+
+  {% if clan %}
+    {% if clan.avatar_url %}
+      <image x="190" y="90" width="60" height="30"
+             href="{{ clan.avatar_url }}" xlink:href="{{ clan.avatar_url }}"
+             preserveAspectRatio="xMidYMid meet"/>
+    {% endif %}
+    <text x="{{ 260 if clan.avatar_url else 190 }}" y="115" class="clan-name">{{ clan.name }}</text>
+    <text x="190" y="160" filter="url(#textShadow)">
+      <tspan class="profile-points">{{ points }}</tspan>
+      <tspan class="profile-points-label" dx="12">POINTS</tspan>
+      {% if playtime is defined %}
+        <tspan class="playtime" dx="35">{{ playtime }}</tspan>
+        <tspan class="playtime-label" dx="12">HOURS</tspan>
+      {% endif %}
+    </text>
+  {% else %}
+    <text x="190" y="120" filter="url(#textShadow)">
+      <tspan class="profile-points">{{ points }}</tspan>
+      <tspan class="profile-points-label" dx="12">POINTS</tspan>
+      {% if playtime is defined %}
+        <tspan class="playtime" dx="35">{{ playtime }}</tspan>
+        <tspan class="playtime-label" dx="12">HOURS</tspan>
+      {% endif %}
+    </text>
+  {% endif %}
+
+  <text x="40" y="195" class="eyebrow">FINISH HISTORY</text>
+  <text x="40" y="227" class="title">Recent finishes</text>
+  <text x="960" y="223" text-anchor="end" class="count">{{ finishes[:10]|length }} latest</text>
+
+  {% for rec in finishes[:10] %}
+    {% set idx = loop.index0 %}
+    {% set col = idx % 2 %}
+    {% set row = idx // 2 %}
+    {% set x = 40 + col * 470 %}
+    {% set y = 240 + row * 106 %}
+    {% set diff = rec.difficulty|lower %}
+    {% if diff == 'easy' %}{% set diff_class='diff-easy' %}
+    {% elif diff == 'main' %}{% set diff_class='diff-main' %}
+    {% elif diff == 'hard' %}{% set diff_class='diff-hard' %}
+    {% elif diff == 'insane' %}{% set diff_class='diff-insane' %}
+    {% elif diff == 'extreme' %}{% set diff_class='diff-extreme' %}
+    {% elif diff == 'solo' %}{% set diff_class='diff-solo' %}
+    {% elif diff == 'jet' %}{% set diff_class='diff-jet' %}
+    {% elif diff == 'mods' %}{% set diff_class='diff-mods' %}
+    {% else %}{% set diff_class='diff-other' %}{% endif %}
+
+    <g>
+      <path d="M {{ x }} {{ y }}
+               H {{ x + 435 }}
+               Q {{ x + 450 }} {{ y }} {{ x + 450 }} {{ y + 15 }}
+               V {{ y + 79 }}
+               Q {{ x + 450 }} {{ y + 94 }} {{ x + 435 }} {{ y + 94 }}
+               H {{ x }} Z" class="card"/>
+      <rect x="{{ x + 2 }}" y="{{ y + 1 }}" width="4" height="92" class="{{ diff_class }}"/>
+
+      <!-- Map name: deliberately large, but isolated from the stats below. -->
+      <text x="{{ x + 20 }}" y="{{ y + 27 }}" class="map-name{% if rec.map_name|length > 15 %} long{% endif %}">{{ rec.map_name }}</text>
+
+      <!-- Difficulty: outlined pill, text centered mathematically. -->
+      {% set diff_w = 30 + rec.difficulty|length * 6.2 %}
+      <rect x="{{ x + 20 }}" y="{{ y + 37 }}" width="{{ diff_w }}" height="21" rx="10.5" class="diff-bg {{ diff_class }}"/>
+      <text x="{{ x + 20 + diff_w / 2 }}" y="{{ y + 51 }}" text-anchor="middle" class="difficulty {{ diff_class }}">{{ rec.difficulty|upper }}</text>
+
+      <!-- Custom, large stars. Their color follows the difficulty. -->
+      {% set star_x = x + 24 + diff_w %}
+      {% for n in range(5) %}
+        {% if n < rec.stars %}
+          <use href="#star" x="{{ star_x + n * 19 }}" y="{{ y + 38 }}" width="18" height="18" class="{{ diff_class }}"/>
+        {% else %}
+          <use href="#star" x="{{ star_x + n * 19 }}" y="{{ y + 38 }}" width="18" height="18" class="star-empty"/>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Team status only when explicitly present. -->
+      {% if rec.is_team %}
+        <rect x="{{ x + 250 }}" y="{{ y + 37 }}" width="74" height="21" rx="10.5" class="mode-team"/>
+        <text x="{{ x + 287 }}" y="{{ y + 51 }}" text-anchor="middle" class="pill-text">TEAM</text>
+      {% elif rec.is_solo_team %}
+        <rect x="{{ x + 250 }}" y="{{ y + 37 }}" width="88" height="21" rx="10.5" class="mode-solo"/>
+        <text x="{{ x + 294 }}" y="{{ y + 51 }}" text-anchor="middle" class="pill-text">SOLO TEAM</text>
+      {% endif %}
+
+      <!-- Time + rank are deliberately separated from the stars. -->
+      {% set total_seconds = rec.time|int %}
+      {% set hours = total_seconds // 3600 %}
+      {% set minutes = (total_seconds // 60) % 60 %}
+      {% set seconds = total_seconds % 60 %}
+
+      <text x="{{ x + 20 }}" y="{{ y + 82 }}">
+        <tspan class="time">{% if hours > 0 %}{{ hours }}h {% endif %}{{ "%02d"|format(minutes) }}m {{ "%02d"|format(seconds) }}s</tspan>
+        <tspan class="rank" dx="16">RANK #{{ rec.rank }}</tspan>
+      </text>
+
+      <!-- Date stays quiet and cannot collide with the time. -->
+      <text x="{{ x + 428 }}" y="{{ y + 80 }}" text-anchor="end" class="date">{{ rec.finished_at[8:10] }}.{{ rec.finished_at[5:7] }}.{{ rec.finished_at[0:4] }} · {{ rec.finished_at[11:16] }}</text>
+
+      <!-- Points are always visible, including +0. -->
+      <text x="{{ x + 428 }}" y="{{ y + 28 }}" text-anchor="end" class="points{% if rec.points == 0 %} zero{% endif %}">{{ "+" if rec.points >= 0 else "" }}{{ rec.points }}</text>
+      <text x="{{ x + 428 }}" y="{{ y + 43 }}" text-anchor="end" class="points-label">POINTS</text>
+
+      {% if rec.is_refinish %}
+        <text x="{{ x + 428 }}" y="{{ y + 58 }}" text-anchor="end" class="refinish">RE-FINISH</text>
+      {% endif %}
+    </g>
+  {% endfor %}
+</svg>

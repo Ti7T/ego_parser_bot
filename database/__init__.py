@@ -12,4 +12,8 @@ from .database import (
     add_allowed_role,
     remove_allowed_role,
     is_role_allowed,
+    
+    set_linked_player,
+    get_linked_player,
+    remove_linked_player
 )

@@ -1,4 +1,4 @@
-from models import DifficultyCounter, Player, Clan, Teammate
+from models import DifficultyCounter, Player, Clan, Teammate, ActivityRecord
 
 from urllib.parse import urlparse
 
@@ -29,6 +29,21 @@ class JSONConverter:
         )
 
     @staticmethod
+    def _to_activity_record(data: dict) -> ActivityRecord:
+        return ActivityRecord(
+            map_name=data["raw_map_name"],
+            time=data["time"],
+            rank=data["map_rank"],
+            points=data["points_gained"],
+            difficulty=data["difficulty"],
+            stars=data["stars"],
+            is_team=data["is_team_race"],
+            is_solo_team=data["is_solo_team"],
+            is_refinish=data["is_refinish"],
+            finished_at=data["finished_at"],
+        )
+
+    @staticmethod
     def to_player(data : dict, api_url : str) -> Player:
         return Player(
             nick=data["nick"],
@@ -48,5 +63,9 @@ class JSONConverter:
                 )
                 for t in data.get("best_teammates", [])
             ],
-            total_playtime=data["playtime"]["total_seconds"]
+            total_playtime=data["playtime"]["total_seconds"],
+            activity_records=[
+                JSONConverter._to_activity_record(record)
+                for record in data.get("activity_records", [])
+            ],
         )
