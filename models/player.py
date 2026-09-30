@@ -20,3 +20,4 @@ class Player:
     best_teammates: list[Teammate]
     total_playtime: int
     activity_records: list[ActivityRecord]
+    point_history: list[ActivityRecord]

@@ -22,6 +22,7 @@ async def setup_hook():
     await bot.load_extension('cogs.emoji_limiter')
     await bot.load_extension('cogs.last_activity')
     await bot.load_extension('cogs.link')
+    await bot.load_extension('cogs.activity')
     await bot.tree.sync()
 
 bot.setup_hook = setup_hook

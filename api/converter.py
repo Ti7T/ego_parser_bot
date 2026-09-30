@@ -31,6 +31,7 @@ class JSONConverter:
     @staticmethod
     def _to_activity_record(data: dict) -> ActivityRecord:
         return ActivityRecord(
+            map_id=data["map_id"],
             map_name=data["raw_map_name"],
             time=data["time"],
             rank=data["map_rank"],
@@ -67,5 +68,9 @@ class JSONConverter:
             activity_records=[
                 JSONConverter._to_activity_record(record)
                 for record in data.get("activity_records", [])
+            ],
+            point_history=[
+                JSONConverter._to_activity_record(record)
+                for record in data.get("records", [])
             ],
         )

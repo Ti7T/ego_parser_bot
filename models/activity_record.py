@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ActivityRecord:
+    map_id: int
     map_name: str
     time: float
     rank: int

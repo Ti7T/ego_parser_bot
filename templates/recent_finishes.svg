@@ -71,9 +71,7 @@
   <!-- Header matched to profile.svg. -->
   <rect x="40" y="40" width="120" height="120" rx="20" fill="url(#avatarFallback)"/>
   {% if avatar_url %}
-    <image x="40" y="40" width="120" height="120"
-           href="{{ avatar_url }}" xlink:href="{{ avatar_url }}"
-           preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)"/>
+    <image x="40" y="40" width="120" height="120" href="{{ avatar_url }}" xlink:href="{{ avatar_url }}" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)"/>
   {% endif %}
   <rect x="40" y="40" width="120" height="120" rx="20" fill="none" stroke="#ff4d57" stroke-width="2.5"/>
   {% if not avatar_url %}
