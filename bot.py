@@ -5,6 +5,9 @@ from api import init_session, close_session
 from config import BOT_TOKEN
 import logging
 from database import init_database
+from pathlib import Path
+from services import PlayerNotFoundError
+
 
 discord.utils.setup_logging(level=logging.INFO)
 
@@ -18,11 +21,15 @@ async def on_ready():
     print(f'Бот {bot.user} готов!')
 
 async def setup_hook():
-    await bot.load_extension('cogs.profile')
-    await bot.load_extension('cogs.emoji_limiter')
-    await bot.load_extension('cogs.last_activity')
-    await bot.load_extension('cogs.link')
-    await bot.load_extension('cogs.activity')
+    cogs_path = Path("cogs")
+
+    for file in cogs_path.glob("*.py"):
+        if file.name == "__init__.py":
+            continue
+
+        extension = f"cogs.{file.stem}"
+        await bot.load_extension(extension)
+
     await bot.tree.sync()
 
 bot.setup_hook = setup_hook
@@ -37,6 +44,21 @@ async def on_app_command_error(
             "У тебя недостаточно прав для использования этой команды.",
             ephemeral=True
         )
+        return
+
+    original = getattr(error, "original", error)
+
+    if isinstance(original, PlayerNotFoundError):
+        message = "❌ Игрок не найден. Проверь правильность ника."
+
+        if interaction.response.is_done():
+            await interaction.followup.send(message, ephemeral=True)
+        else:
+            await interaction.response.send_message(
+                message,
+                ephemeral=True,
+            )
+
         return
 
     # Все неизвестные ошибки продолжаем выводить в консоль

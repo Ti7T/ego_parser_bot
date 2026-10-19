@@ -3,34 +3,28 @@ from discord.ext import commands
 from discord import app_commands
 from services import get_player, create_recent_finishes
 from typing import Optional
-from database import get_linked_player
+from utils import resolve_nick_argument
 
-class LastActivityCog(commands.Cog):
+class RecentFinishesCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @app_commands.command(
-        name="last_activity",
+        name="recent_finishes",
         description="Показать последнюю активность игрока на EGO серверах"
     )
     @app_commands.describe(
         nick="Ник игрока на EGO"
     )
-    async def profile(
+    async def recent_finishes(
         self,
         interaction: discord.Interaction,
         nick: Optional[str] = None
     ):
-        #TODO: нужно сделать отдельную функцию, для проверки ника
-        if nick is None:
-            nick = get_linked_player(interaction.user.id)
-            if nick is None:
-                await interaction.response.send_message(
-                    "❌ У тебя не привязан игровой ник.\n"
-                    "Используй `/link`, чтобы привязать его.",
-                    ephemeral=True
-                )
-                return
+        nick = await resolve_nick_argument(nick, interaction) 
+        if nick is None:                                                                                        
+            return
+
         await interaction.response.defer(thinking=True)
         player = await get_player(nick)
         image = await create_recent_finishes(player)
@@ -41,4 +35,4 @@ class LastActivityCog(commands.Cog):
         await interaction.followup.send(file=file)
 
 async def setup(bot):
-    await bot.add_cog(LastActivityCog(bot))
+    await bot.add_cog(RecentFinishesCog(bot))

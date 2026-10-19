@@ -36,7 +36,10 @@ async def parse_url(endpoint: str) -> dict | None:
         print(f"Unexpected error: {e}")
         return None
 
-async def url_to_base64_async(url: str) -> str:
+async def url_to_base64_async(url: str | None) -> str | None:
+    if not url:
+        return None
+
     session = client.http_session
     async with session.get(url) as response:
         response.raise_for_status()
@@ -53,7 +56,7 @@ async def main():
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
         session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers=headers)
-        result = await get_player_json(url, session)
+        result = await get_player_json("ZнdyyR")
         if result:
             print(result)
     finally:

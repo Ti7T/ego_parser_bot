@@ -13,5 +13,5 @@ def load_template(template_name: str) -> Template:
         raise RuntimeError(f"Не удалось загрузить шаблон {template_name}") from e
 
 if __name__ == "__main__":
-    template = load_template("profile_card.svg")
+    template = load_template("profile.svg")
     svg_content = template.render(username="Alice", level=42)

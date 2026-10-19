@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 from services import create_profile, get_player
 from typing import Optional
-from database import get_linked_player
+from utils import resolve_nick_argument
 
 class ProfileCog(commands.Cog):
     def __init__(self, bot):
@@ -21,16 +21,10 @@ class ProfileCog(commands.Cog):
         interaction: discord.Interaction,
         nick: Optional[str] = None
     ):
-        if nick is None:
-            nick = get_linked_player(interaction.user.id)
-            if nick is None:
-                await interaction.response.send_message(
-                    "❌ У тебя не привязан игровой ник.\n"
-                    "Используй `/link`, чтобы привязать его.",
-                    ephemeral=True
-                )
-                return
-
+        nick = await resolve_nick_argument(nick, interaction) 
+        if nick is None:                                                                                        
+            return
+        
         await interaction.response.defer(thinking=True)
         player = await get_player(nick)
         image = await create_profile(player)
@@ -52,15 +46,10 @@ class ProfileCog(commands.Cog):
         interaction: discord.Interaction,
         nick: Optional[str] = None
     ):
-        if nick is None:
-            nick = get_linked_player(interaction.user.id)
-            if nick is None:
-                await interaction.response.send_message(
-                    "❌ У тебя не привязан игровой ник.\n"
-                    "Используй `/link`, чтобы привязать его.",
-                    ephemeral=True
-                )
-                return
+        nick = await resolve_nick_argument(nick, interaction) 
+        if nick is None:                                                                                        
+            return
+        
 
         await interaction.response.defer(ephemeral=True, thinking=True)
         player = await get_player(nick)

@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 from services import get_player, create_activity_graphs
 from typing import Optional
-from database import get_linked_player
+from utils import resolve_nick_argument
 
 class ActivityCog(commands.Cog):
     def __init__(self, bot):
@@ -21,21 +21,16 @@ class ActivityCog(commands.Cog):
         interaction: discord.Interaction,
         nick: Optional[str] = None
     ):
-        if nick is None:
-            nick = get_linked_player(interaction.user.id)
-            if nick is None:
-                await interaction.response.send_message(
-                    "❌ У тебя не привязан игровой ник.\n"
-                    "Используй `/link`, чтобы привязать его.",
-                    ephemeral=True
-                )
-                return
+        nick = await resolve_nick_argument(nick, interaction) 
+        if nick is None:                                                                                        
+            return
+        
         await interaction.response.defer(thinking=True)
         player = await get_player(nick)
         image = await create_activity_graphs(player)
         file = discord.File(
             fp=image, 
-            filename="actvity.png"
+            filename="activity.png"
         )
         await interaction.followup.send(file=file)
 
