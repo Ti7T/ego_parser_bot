@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1000" height="1040" viewBox="0 0 1000 1040">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#18191d"/>
+      <stop offset="100%" stop-color="#101114"/>
+    </linearGradient>
+    <linearGradient id="avatarFallback" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2b2e35"/>
+      <stop offset="100%" stop-color="#1c1e23"/>
+    </linearGradient>
+    <filter id="textShadow" x="-10%" y="-20%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.32"/>
+    </filter>
+    <clipPath id="avatarClip"><rect x="40" y="40" width="120" height="120" rx="20"/></clipPath>
+  </defs>
+
+  <style>
+    text { font-family: 'Inter', 'Noto Sans', sans-serif; }
+    .nick { font-weight:800; font-size:44px; fill:#fff; letter-spacing:-.02em; }
+    .profile-rank { font-weight:700; font-size:26px; fill:#ff4d57; letter-spacing:.02em; }
+    .clan-name { font-weight:600; font-size:24px; fill:#fff; letter-spacing:.01em; }
+    .profile-points { font-weight:800; font-size:32px; fill:#ff4d57; letter-spacing:.01em; }
+    .profile-points-label { font-weight:600; font-size:20px; fill:#999; letter-spacing:.08em; }
+    .eyebrow { font-weight:700; font-size:13px; fill:#ff4d57; letter-spacing:.16em; }
+    .title { font-weight:800; font-size:30px; fill:#fff; letter-spacing:-.025em; }
+    .count { font-weight:600; font-size:15px; fill:#858991; }
+    .section-title { font-weight:800; font-size:22px; fill:#fff; letter-spacing:-.015em; }
+    .section-subtitle { font-weight:500; font-size:13px; fill:#737780; }
+    .axis-label { font-weight:500; font-size:11px; fill:#686d77; }
+    .axis-value { font-weight:600; font-size:11px; fill:#858a94; }
+    .grid { stroke:#292c32; stroke-width:1; }
+    .grid-soft { stroke:#22252b; stroke-width:1; }
+    .points-line { fill:none; stroke:#ff4d57; stroke-width:3; stroke-linejoin:round; stroke-linecap:round; }
+    .points-area { fill:#ff4d57; opacity:.055; }
+    .point { fill:#18191d; stroke:#ff4d57; stroke-width:2; }
+    .activity-square { stroke:#2b2e34; stroke-width:1; }
+    .activity-0 { fill:#1a1c20; }
+    .activity-1 { fill:#4b272c; }
+    .activity-2 { fill:#87353d; }
+    .activity-3 { fill:#ff4d57; }
+    .week-label, .day-label { font-weight:600; font-size:10px; fill:#686d77; }
+    .legend-label { font-weight:500; font-size:10px; fill:#777c85; }
+  </style>
+
+  <rect x="10" y="10" width="980" height="1020" rx="24" fill="url(#bg)" stroke="#2d2d2d" stroke-width="1.5"/>
+
+  <!-- USER HEADER: matched to recent_finishes.svg / profile.svg. -->
+  <rect x="40" y="40" width="120" height="120" rx="20" fill="url(#avatarFallback)"/>
+  {% if avatar_url %}
+    <image x="40" y="40" width="120" height="120" href="{{ avatar_url }}" xlink:href="{{ avatar_url }}" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)"/>
+  {% endif %}
+  <rect x="40" y="40" width="120" height="120" rx="20" fill="none" stroke="#ff4d57" stroke-width="2.5"/>
+  {% if not avatar_url %}
+    <text x="100" y="113" text-anchor="middle" style="font-weight:800;font-size:28px;fill:#777d88;">?</text>
+  {% endif %}
+
+  <text x="190" y="80" filter="url(#textShadow)">
+    <tspan class="nick">{{ nick }}</tspan>
+    <tspan class="profile-rank" dx="18">#{{ rank }}</tspan>
+  </text>
+
+  {% if clan %}
+    {% if clan.avatar_url %}
+      <image x="190" y="90" width="60" height="30"
+             href="{{ clan.avatar_url }}" xlink:href="{{ clan.avatar_url }}"
+             preserveAspectRatio="xMidYMid meet"/>
+    {% endif %}
+    <text x="{{ 260 if clan.avatar_url else 190 }}" y="115" class="clan-name">{{ clan.name }}</text>
+    <text x="190" y="160" filter="url(#textShadow)">
+      <tspan class="profile-points">{{ points }}</tspan>
+      <tspan class="profile-points-label" dx="12">POINTS</tspan>
+    </text>
+  {% else %}
+    <text x="190" y="120" filter="url(#textShadow)">
+      <tspan class="profile-points">{{ points }}</tspan>
+      <tspan class="profile-points-label" dx="12">POINTS</tspan>
+    </text>
+  {% endif %}
+
+  <!-- POINTS -->
+  <text x="40" y="192" class="eyebrow">POINTS HISTORY</text>
+  <text x="40" y="231" class="title">Points</text>
+  <text x="960" y="227" text-anchor="end" class="count">Progress over time</text>
+
+  {% set chart_x = 90 %}
+  {% set chart_y = 250 %}
+  {% set chart_w = 850 %}
+  {% set chart_h = 300 %}
+  {% set history_len = point_history|length %}
+  {% set label_step = ((history_len - 1) // 5) if history_len > 1 else 1 %}
+
+  {% set first_time = point_history[0].timestamp if history_len > 0 else 0 %}
+  {% set last_time = point_history[-1].timestamp if history_len > 0 else 1 %}
+  {% set time_span = last_time - first_time %}
+
+  {% for tick in point_ticks %}
+    {% set gy = chart_y + chart_h - ((tick / point_max) * chart_h if point_max > 0 else 0) %}
+    <line x1="{{ chart_x }}" y1="{{ gy }}" x2="{{ chart_x + chart_w }}" y2="{{ gy }}" class="grid"/>
+    <text x="{{ chart_x - 14 }}" y="{{ gy + 4 }}" text-anchor="end" class="axis-value">{{ tick }}</text>
+  {% endfor %}
+
+  {# The plotted X coordinate is still based on the real timestamp.
+     Axis labels are independent: the renderer provides the start date, each month boundary, and the end date. #}
+  {% for tick in time_ticks %}
+    {% set tx = chart_x + tick.position * chart_w %}
+    <line x1="{{ tx }}" y1="{{ chart_y }}" x2="{{ tx }}" y2="{{ chart_y + chart_h }}" class="grid-soft"/>
+    <text x="{{ tx }}" y="{{ chart_y + chart_h + 22 }}" text-anchor="middle" class="axis-label">{{ tick.label }}</text>
+  {% endfor %}
+
+  {% if history_len > 0 %}
+    {% set ns = namespace(area='M ' ~ chart_x ~ ' ' ~ (chart_y + chart_h), line='') %}
+    {% for item in point_history %}
+      {% set px = chart_x + (((item.timestamp - first_time) / time_span) * chart_w if time_span > 0 else 0) %}
+      {% set py = chart_y + chart_h - ((item.points / point_max) * chart_h if point_max > 0 else 0) %}
+      {% if loop.first %}
+        {% set ns.line = 'M ' ~ px ~ ' ' ~ py %}
+        {% set ns.area = ns.area ~ ' L ' ~ px ~ ' ' ~ py %}
+      {% else %}
+        {% set ns.line = ns.line ~ ' H ' ~ px ~ ' V ' ~ py %}
+        {% set ns.area = ns.area ~ ' H ' ~ px ~ ' V ' ~ py %}
+      {% endif %}
+    {% endfor %}
+    {% set last_px = chart_x + chart_w %}
+    {% set ns.area = ns.area ~ ' L ' ~ last_px ~ ' ' ~ (chart_y + chart_h) ~ ' Z' %}
+    <path d="{{ ns.area }}" class="points-area"/>
+    <path d="{{ ns.line }}" class="points-line"/>
+    {% for item in point_history %}
+      {% if loop.first or loop.last %}
+        {% set px = chart_x + (((item.timestamp - first_time) / time_span) * chart_w if time_span > 0 else 0) %}
+        {% set py = chart_y + chart_h - ((item.points / point_max) * chart_h if point_max > 0 else 0) %}
+        <circle cx="{{ px }}" cy="{{ py }}" r="5" class="point"/>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  <!-- MAP ACTIVITY -->
+  <!-- activity_weeks should be built from ALL finish records, including points_gained=0.
+       Collapse only exact duplicate representations of the same play by (map_id, finished_at). -->
+  <text x="40" y="610" class="eyebrow">MAP ACTIVITY</text>
+  <text x="40" y="642" class="title">Map activity</text>
+  <text x="960" y="638" text-anchor="end" class="count">Last 21 weeks</text>
+
+  {% set grid_x = 90 %}
+  {% set grid_y = 690 %}
+  {% set square = activity_square %}
+  {% set step = activity_step %}
+
+  {% for day in activity_days %}
+    <text x="{{ grid_x - 10 }}" y="{{ grid_y + loop.index0 * step + 23 }}" text-anchor="end" class="day-label">{{ day }}</text>
+  {% endfor %}
+
+  {% for week in activity_weeks %}
+    {% set wx = grid_x + loop.index0 * step %}
+    <text x="{{ wx + square / 2 }}" y="{{ grid_y - 13 }}" text-anchor="middle" class="week-label">{{ week.label }}</text>
+    {% for day in week.days %}
+      {% if day.count == 0 %}{% set level = 0 %}
+      {% elif day.count <= 2 %}{% set level = 1 %}
+      {% elif day.count <= 5 %}{% set level = 2 %}
+      {% else %}{% set level = 3 %}{% endif %}
+      <rect x="{{ wx }}" y="{{ grid_y + loop.index0 * step }}" width="{{ square }}" height="{{ square }}" rx="7" class="activity-square activity-{{ level }}"/>
+    {% endfor %}
+  {% endfor %}
+
+  {% set legend_x = grid_x %}
+  {% set legend_y = grid_y + 7 * step + 25 %}
+  <text x="{{ legend_x }}" y="{{ legend_y }}" class="legend-label">finishes / day</text>
+  {% for value in activity_legend %}
+    {% set lx = legend_x + 86 + loop.index0 * 58 %}
+    <rect x="{{ lx }}" y="{{ legend_y - 11 }}" width="24" height="24" rx="6" class="activity-square activity-{{ value.level }}"/>
+    <text x="{{ lx + 30 }}" y="{{ legend_y + 5 }}" class="legend-label">{{ value.label }}</text>
+  {% endfor %}
+</svg>

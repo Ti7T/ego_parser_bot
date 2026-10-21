@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="620" viewBox="0 0 1000 620">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#18191d" />
+      <stop offset="100%" stop-color="#101114" />
+    </linearGradient>
+    <clipPath id="avatarClip">
+      <rect x="40" y="40" width="120" height="120" rx="20" />
+    </clipPath>
+    <clipPath id="teammateClip" clipPathUnits="objectBoundingBox">
+      <rect x="0" y="0" width="1" height="1" rx="0.167" />
+    </clipPath>
+    <filter id="textShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <style>
+    text {
+      font-family: 'Inter';
+    }
+    .nick {
+      font-weight: 800;
+      font-size: 44px;
+      fill: #ffffff;
+      letter-spacing: -0.02em;
+    }
+    .rank {
+      font-weight: 700;
+      font-size: 26px;
+      fill: #ff4d57;
+      letter-spacing: 0.02em;
+    }
+    .points {
+      font-weight: 800;
+      font-size: 32px;
+      fill: #ff4d57;
+      letter-spacing: 0.01em;
+    }
+    .points-label {
+      font-weight: 600;
+      font-size: 20px;
+      fill: #999999;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .clan-name {
+      font-weight: 600;
+      font-size: 24px;
+      fill: #ffffff;
+      letter-spacing: 0.01em;
+    }
+    .cat-name {
+      font-weight: 700;
+      font-size: 22px;
+      fill: #ffffff;
+      letter-spacing: -0.01em;
+    }
+    .cat-percent {
+      font-weight: 600;
+      font-size: 18px;
+      fill: #dddddd;
+    }
+    .cat-completed {
+      font-weight: 800;
+      font-size: 22px;
+      fill: #ff4d57;
+    }
+    .cat-total {
+      font-weight: 500;
+      font-size: 18px;
+      fill: #999999;
+    }
+    .teammate-name {
+      font-weight: 600;
+      font-size: 20px;
+      fill: #ffffff;
+    }
+    .teammate-maps {
+      font-weight: 400;
+      font-size: 14px;
+      fill: #999999;
+      letter-spacing: 0.02em;
+    }
+    .section-title {
+      font-weight: 700;
+      font-size: 24px;
+      fill: #ffffff;
+      letter-spacing: 0.02em;
+    }
+    .playtime {
+      font-weight: 800;
+      font-size: 32px;
+      fill: #ff4d57;
+      letter-spacing: 0.01em;
+    }
+
+    .playtime-label {
+      font-weight: 600;
+      font-size: 20px;
+      fill: #999999;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  </style>
+
+  <!-- Фон и рамка -->
+  <rect x="10" y="10" width="980" height="600" rx="24" fill="url(#bg)" stroke="#2d2d2d" stroke-width="1.5" />
+
+  <!-- Аватарка -->
+  <rect x="40" y="40" width="120" height="120" rx="20" fill="#333" />
+  <image x="40" y="40" width="120" height="120" 
+         href="{{ avatar_url }}" xlink:href="{{ avatar_url }}"
+         preserveAspectRatio="xMidYMid slice"
+         clip-path="url(#avatarClip)" />
+  <rect x="40" y="40" width="120" height="120" rx="20" fill="none" stroke="#ff4d57" stroke-width="2.5" />
+
+  <!-- Никнейм + ранг (в одной строке) -->
+  <text x="190" y="80" filter="url(#textShadow)">
+    <tspan class="nick">{{ nick }}</tspan>
+    <tspan class="rank" dx="18">#{{ rank }}</tspan>
+  </text>
+
+  <!-- Блок клана (если передан) -->
+  {% if clan %}
+    <!-- Аватарка клана -->
+    <image x="190" y="90" width="60" height="30" 
+           href="{{ clan.avatar_url }}" xlink:href="{{ clan.avatar_url }}"
+           preserveAspectRatio="xMidYMid meet" />
+    <!-- Название клана -->
+    <text x="260" y="115" class="clan-name">{{ clan.name }}</text>
+    <!-- Очки и подпись (ниже) -->
+    <text x="190" y="160" filter="url(#textShadow)">
+      <tspan class="points">{{ points }}</tspan>
+      <tspan class="points-label" dx="12">POINTS</tspan>
+      
+      <tspan class="playtime" dx="35">{{ playtime }}</tspan>
+      <tspan class="playtime-label" dx="12">HOURS</tspan>
+    </text>
+  {% else %}
+    <!-- Без клана – точки на той же высоте, что и раньше -->
+    <text x="190" y="120" filter="url(#textShadow)">
+      <tspan class="points">{{ points }}</tspan>
+      <tspan class="points-label" dx="12">POINTS</tspan>
+      
+      <tspan class="playtime" dx="35">{{ playtime }}</tspan>
+      <tspan class="playtime-label" dx="12">HOURS</tspan>
+    </text>
+  {% endif %}
+
+  <!-- Категории – сетка 2×4 -->
+  {% for cat in categories %}
+    {% set idx = loop.index0 %}
+    {% set col = idx % 4 %}
+    {% set row = idx // 4 %}
+    {% set x = 40 + col * 230 %}
+    {% set y = 200 + row * 150 %}
+
+    <rect x="{{ x }}" y="{{ y }}" width="210" height="120" rx="16" fill="#16181c" stroke="#2d2d2d" stroke-width="1" />
+
+    <text x="{{ x + 18 }}" y="{{ y + 32 }}" class="cat-name">{{ cat.name }}</text>
+
+    <!-- Прогресс-бар -->
+    <rect x="{{ x + 18 }}" y="{{ y + 52 }}" width="180" height="8" rx="4" fill="#30323a" />
+    <rect x="{{ x + 18 }}" y="{{ y + 52 }}" width="{{ cat.percent * 180 / 100 }}" height="8" rx="4" fill="#ff4d57" />
+
+    <!-- Процент -->
+    <text x="{{ x + 18 }}" y="{{ y + 82 }}" class="cat-percent">{{ cat.percent }}%</text>
+
+    <!-- Выполнено / всего -->
+    <text x="{{ x + 18 }}" y="{{ y + 108 }}">
+      <tspan class="cat-completed">{{ cat.completed }}</tspan>
+      <tspan class="cat-total">/{{ cat.total }}</tspan>
+    </text>
+  {% endfor %}
+
+  <!-- Разделитель -->
+  <line x1="40" y1="500" x2="960" y2="500" stroke="#2d2d2d" stroke-width="1.5" />
+
+  <!-- Заголовок "Best teammates" -->
+  <text x="40" y="540" class="section-title">Best teammates</text>
+
+  <!-- Тиммейты (первые 5) -->
+  {% for tm in teammates[:5] %}
+    {% set cx = 60 + loop.index0 * 180 %}
+    {% set cy = 575 %}
+    {% set size = 38 %}
+    {% set offset = size // 2 %}
+
+    <g>
+      <!-- фон аватарки -->
+      <rect x="{{ cx - offset }}" y="{{ cy - offset }}" width="{{ size }}" height="{{ size }}" rx="8" fill="#333" />
+      <!-- аватарка -->
+      <image x="{{ cx - offset }}" y="{{ cy - offset }}" width="{{ size }}" height="{{ size }}"
+             href="{{ tm.avatar_url }}" xlink:href="{{ tm.avatar_url }}"
+             preserveAspectRatio="xMidYMid slice"
+             clip-path="url(#teammateClip)" />
+      <!-- обводка -->
+      <rect x="{{ cx - offset }}" y="{{ cy - offset }}" width="{{ size }}" height="{{ size }}" rx="8"
+            fill="none" stroke="#ff4d57" stroke-width="2" />
+    </g>
+
+    <!-- Имя и количество карт -->
+    <text x="{{ cx + offset + 12 }}" y="{{ cy - 6 }}" class="teammate-name">{{ tm.name }}</text>
+    <text x="{{ cx + offset + 12 }}" y="{{ cy + 20 }}" class="teammate-maps">{{ tm.maps }} maps</text>
+  {% endfor %}
+
+</svg>
