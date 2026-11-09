@@ -4,3 +4,5 @@
 *.pyo
 *.db
 *.json
+.venv/
+venv/
