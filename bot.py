@@ -13,6 +13,8 @@ discord.utils.setup_logging(level=logging.INFO)
 
 intents = discord.Intents.default()
 intents.message_content = True 
+intents.members = True
+intents.reactions = True 
 
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
