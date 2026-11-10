@@ -14,14 +14,16 @@ class ProfileCog(commands.Cog):
         description="Показать статистику игрока на EGO серверах"
     )
     @app_commands.describe(
-        nick="Ник игрока на EGO"
+        nick="Ник игрока на EGO",
+        member="Упоминания пользователя на сервере(работает если пользователь использовал /link)"
     )
     async def profile(
         self,
         interaction: discord.Interaction,
-        nick: Optional[str] = None
+        nick: str | None = None,
+        member: discord.Member | None = None
     ):
-        nick = await resolve_nick_argument(nick, interaction) 
+        nick = await resolve_nick_argument(nick, member, interaction) 
         if nick is None:                                                                                        
             return
         
@@ -39,14 +41,16 @@ class ProfileCog(commands.Cog):
         description="Показать невидимую для остальных кроме вас статистику игрока на EGO серверах"
     )
     @app_commands.describe(
-        nick="Ник игрока на EGO"
+        nick="Ник игрока на EGO",
+        member="Упоминания пользователя на сервере(работает если пользователь использовал /link)"
     )
     async def private_profile(
         self,
         interaction: discord.Interaction,
-        nick: Optional[str] = None
+        nick: str | None = None,
+        member: discord.Member | None = None
     ):
-        nick = await resolve_nick_argument(nick, interaction) 
+        nick = await resolve_nick_argument(nick, member, interaction) 
         if nick is None:                                                                                        
             return
         

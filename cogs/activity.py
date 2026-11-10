@@ -14,14 +14,16 @@ class ActivityCog(commands.Cog):
         description="Показать активность игрока на EGO серверах"
     )
     @app_commands.describe(
-        nick="Ник игрока на EGO"
+        nick="Ник игрока на EGO",
+        member="Упоминания пользователя на сервере(работает если пользователь использовал /link)"
     )
     async def profile(
         self,
         interaction: discord.Interaction,
-        nick: Optional[str] = None
+        nick: str | None = None,
+        member: discord.Member | None = None
     ):
-        nick = await resolve_nick_argument(nick, interaction) 
+        nick = await resolve_nick_argument(nick, member, interaction) 
         if nick is None:                                                                                        
             return
         
