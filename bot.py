@@ -7,6 +7,7 @@ import logging
 from database import init_database
 from pathlib import Path
 from services import PlayerNotFoundError
+from localization import t
 
 
 discord.utils.setup_logging(level=logging.INFO)
@@ -43,7 +44,7 @@ async def on_app_command_error(
 ):
     if isinstance(error, discord.app_commands.MissingPermissions):
         await interaction.response.send_message(
-            "У тебя недостаточно прав для использования этой команды.",
+            t(interaction.user.id, "not_enough_permissions"),
             ephemeral=True
         )
         return
@@ -51,7 +52,7 @@ async def on_app_command_error(
     original = getattr(error, "original", error)
 
     if isinstance(original, PlayerNotFoundError):
-        message = "❌ Игрок не найден. Проверь правильность ника."
+        message = t(interaction.user.id, "player_not_found")
 
         if interaction.response.is_done():
             await interaction.followup.send(message, ephemeral=True)
@@ -63,7 +64,6 @@ async def on_app_command_error(
 
         return
 
-    # Все неизвестные ошибки продолжаем выводить в консоль
     print(f"Ошибка в slash-команде: {error}")
 
     import traceback
@@ -72,6 +72,12 @@ async def on_app_command_error(
         error,
         error.__traceback__
     )
+
+    message = t(interaction.user.id, "unexpected_error")
+    if interaction.response.is_done():
+        await interaction.followup.send(message, ephemeral=True)
+    else:
+        await interaction.response.send_message(message, ephemeral=True)
 
 async def main():
     await init_session()

@@ -92,26 +92,26 @@
     <text x="{{ 260 if clan.avatar_url else 190 }}" y="115" class="clan-name">{{ clan.name }}</text>
     <text x="190" y="160" filter="url(#textShadow)">
       <tspan class="profile-points">{{ points }}</tspan>
-      <tspan class="profile-points-label" dx="12">POINTS</tspan>
+      <tspan class="profile-points-label" dx="12">{{ labels.profile_points_label }}</tspan>
       {% if playtime is defined %}
         <tspan class="playtime" dx="35">{{ playtime }}</tspan>
-        <tspan class="playtime-label" dx="12">HOURS</tspan>
+        <tspan class="playtime-label" dx="12">{{ labels.profile_hours_label }}</tspan>
       {% endif %}
     </text>
   {% else %}
     <text x="190" y="120" filter="url(#textShadow)">
       <tspan class="profile-points">{{ points }}</tspan>
-      <tspan class="profile-points-label" dx="12">POINTS</tspan>
+      <tspan class="profile-points-label" dx="12">{{ labels.profile_points_label }}</tspan>
       {% if playtime is defined %}
         <tspan class="playtime" dx="35">{{ playtime }}</tspan>
-        <tspan class="playtime-label" dx="12">HOURS</tspan>
+        <tspan class="playtime-label" dx="12">{{ labels.profile_hours_label }}</tspan>
       {% endif %}
     </text>
   {% endif %}
 
-  <text x="40" y="195" class="eyebrow">FINISH HISTORY</text>
-  <text x="40" y="227" class="title">Recent finishes</text>
-  <text x="960" y="223" text-anchor="end" class="count">{{ finishes[:10]|length }} latest</text>
+  <text x="40" y="195" class="eyebrow">{{ labels.finishes_eyebrow }}</text>
+  <text x="40" y="227" class="title">{{ labels.finishes_title }}</text>
+  <text x="960" y="223" text-anchor="end" class="count">{{ labels.finishes_latest.format(count=finishes[:10]|length) }}</text>
 
   {% for rec in finishes[:10] %}
     {% set idx = loop.index0 %}
@@ -160,10 +160,10 @@
       <!-- Team status only when explicitly present. -->
       {% if rec.is_team %}
         <rect x="{{ x + 250 }}" y="{{ y + 37 }}" width="74" height="21" rx="10.5" class="mode-team"/>
-        <text x="{{ x + 287 }}" y="{{ y + 51 }}" text-anchor="middle" class="pill-text">TEAM</text>
+        <text x="{{ x + 287 }}" y="{{ y + 51 }}" text-anchor="middle" class="pill-text">{{ labels.finishes_team }}</text>
       {% elif rec.is_solo_team %}
         <rect x="{{ x + 250 }}" y="{{ y + 37 }}" width="88" height="21" rx="10.5" class="mode-solo"/>
-        <text x="{{ x + 294 }}" y="{{ y + 51 }}" text-anchor="middle" class="pill-text">SOLO TEAM</text>
+        <text x="{{ x + 294 }}" y="{{ y + 51 }}" text-anchor="middle" class="pill-text">{{ labels.finishes_solo_team }}</text>
       {% endif %}
 
       <!-- Time + rank are deliberately separated from the stars. -->
@@ -174,7 +174,7 @@
 
       <text x="{{ x + 20 }}" y="{{ y + 82 }}">
         <tspan class="time">{% if hours > 0 %}{{ hours }}h {% endif %}{{ "%02d"|format(minutes) }}m {{ "%02d"|format(seconds) }}s</tspan>
-        <tspan class="rank" dx="16">RANK #{{ rec.rank }}</tspan>
+        <tspan class="rank" dx="16">{{ labels.finishes_rank.format(rank=rec.rank) }}</tspan>
       </text>
 
       <!-- Date stays quiet and cannot collide with the time. -->
@@ -182,10 +182,10 @@
 
       <!-- Points are always visible, including +0. -->
       <text x="{{ x + 428 }}" y="{{ y + 28 }}" text-anchor="end" class="points{% if rec.points == 0 %} zero{% endif %}">{{ "+" if rec.points >= 0 else "" }}{{ rec.points }}</text>
-      <text x="{{ x + 428 }}" y="{{ y + 43 }}" text-anchor="end" class="points-label">POINTS</text>
+      <text x="{{ x + 428 }}" y="{{ y + 43 }}" text-anchor="end" class="points-label">{{ labels.profile_points_label }}</text>
 
       {% if rec.is_refinish %}
-        <text x="{{ x + 428 }}" y="{{ y + 58 }}" text-anchor="end" class="refinish">RE-FINISH</text>
+        <text x="{{ x + 428 }}" y="{{ y + 58 }}" text-anchor="end" class="refinish">{{ labels.finishes_refinish }}</text>
       {% endif %}
     </g>
   {% endfor %}

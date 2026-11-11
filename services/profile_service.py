@@ -4,16 +4,17 @@ from PIL import ImageFont
 from typing import Any
 from .render_service import FONT_PATH, render_svg, svg_to_png
 from .player_service import make_player_header_data
+from localization import TEXTS
 
-async def create_profile(player: Player):
-    data = await make_profile_data(player)
+async def create_profile(player: Player, language: str = "ru"):
+    data = await make_profile_data(player, language)
     svg = render_svg("profile.svg", data)
     # with open("debug.svg", "w", encoding="utf-8") as f:
     #     f.write(svg)
     return svg_to_png(svg)
 
 
-async def make_profile_data(player: Player) -> dict[str, Any]:
+async def make_profile_data(player: Player, language: str = "ru") -> dict[str, Any]:
     # 1. Категории: список словарей для каждого уровня сложности
     categories = []
     # Список полей в том же порядке, что и в SVG (Easy, Main, Hard, Insane, Extreme, Jet, Solo, Mods)
@@ -57,6 +58,7 @@ async def make_profile_data(player: Player) -> dict[str, Any]:
     data = await make_player_header_data(player=player)
 
     data.update({
+        "labels": TEXTS.get(language, TEXTS["ru"]),
         "categories": categories,
         "teammates": teammates,
         "nick_width": font_nick.getlength(player.nick),

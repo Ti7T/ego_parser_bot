@@ -4,6 +4,7 @@ from discord import app_commands
 from database import get_emoji_role, set_emoji_on_message, remove_emoji_on_message, remove_all_emoji_on_message
 from utils import serialize_emoji
 import json
+from localization import t
 
 class ReactionRoles(commands.Cog):
     def __init__(self, bot):
@@ -62,10 +63,10 @@ class ReactionRoles(commands.Cog):
     
     @app_commands.command(
         name="reaction_roles_create",
-        description="Создаёт сообщение для выдачи ролей"
+        description="Создать сообщение для выдачи ролей / Create a reaction-role message"
     )
     @app_commands.describe(
-        config="Конфигурация сообщения в формате JSON"
+        config="Конфигурация сообщения в JSON / Message configuration in JSON"
     )
     @app_commands.guild_only()
     @app_commands.default_permissions(manage_guild=True)
@@ -83,27 +84,27 @@ class ReactionRoles(commands.Cog):
             roles = data["roles"]
 
             if not isinstance(title, str) or not isinstance(description, str):
-                raise ValueError("title и description должны быть строками")
+                raise ValueError(t(interaction.user.id, "json_title_type"))
 
             if not isinstance(roles, list):
-                raise ValueError("roles должен быть списком")
+                raise ValueError(t(interaction.user.id, "json_roles_type"))
 
             for role_data in roles:
                 if not isinstance(role_data, dict):
-                    raise ValueError("Каждая роль должна быть объектом")
+                    raise ValueError(t(interaction.user.id, "json_role_object"))
 
                 if not isinstance(role_data.get("role_id"), int):
-                    raise ValueError("role_id должен быть числом")
+                    raise ValueError(t(interaction.user.id, "json_role_id"))
 
                 if not isinstance(role_data.get("emoji"), str):
-                    raise ValueError("emoji должен быть строкой")
+                    raise ValueError(t(interaction.user.id, "json_emoji"))
 
                 if not isinstance(role_data.get("description"), str):
-                    raise ValueError("description роли должен быть строкой")
+                    raise ValueError(t(interaction.user.id, "json_role_description"))
 
         except (json.JSONDecodeError, KeyError, ValueError) as error:
             await interaction.response.send_message(
-                f"Некорректный JSON: {error}",
+                t(interaction.user.id, "reaction_json_error", error=error),
                 ephemeral=True
             )
             return
@@ -157,7 +158,7 @@ class ReactionRoles(commands.Cog):
 
         container.add_item(
             discord.ui.TextDisplay(
-                "-# Вы можете изменить свой выбор в любое время."
+                t(interaction.user.id, "reaction_footer")
             )
         )
 
@@ -169,19 +170,19 @@ class ReactionRoles(commands.Cog):
         await interaction.channel.send(view=view)
 
         await interaction.followup.send(
-            "Сообщение успешно опубликовано.",
+            t(interaction.user.id, "reaction_published"),
             ephemeral=True
         )
 
 
     @app_commands.command(
         name="reaction_roles_add",
-        description="Добавляет реакцию на сообщение с определенной ролью"
+        description="Привязать реакцию к роли / Link a reaction to a role"
     )
     @app_commands.describe(
-        message_id="ID сообщения за которым будет привязана",
-        emoji="Реакция на сообщение, за которую будет выдана роль",
-        role="Роль, которая будет вадана по нажатию на эмоцию"
+        message_id="ID сообщения / Message ID",
+        emoji="Эмодзи реакции / Reaction emoji",
+        role="Выдаваемая роль / Role to assign"
     )
     @app_commands.guild_only()
     @app_commands.default_permissions(manage_guild=True)
@@ -198,28 +199,28 @@ class ReactionRoles(commands.Cog):
             set_emoji_on_message(message_id, emoji, role.id)
         except discord.NotFound:
             await interaction.response.send_message(
-                "Сообщение с таким ID не найдено в этом канале.", ephemeral=True
+                t(interaction.user.id, "message_not_found"), ephemeral=True
             )
             return
         except discord.Forbidden:
             await interaction.response.send_message(
-                "У бота нет доступа к этому каналу.", ephemeral=True
+                t(interaction.user.id, "bot_no_access"), ephemeral=True
             )
             return
         
         await message.add_reaction(emoji)
         await interaction.response.send_message(
-            f"Реакция {emoji} успешно добавлена!",
+            t(interaction.user.id, "reaction_added", emoji=emoji),
             ephemeral=True
         )
 
     @app_commands.command(
         name="reaction_roles_remove",
-        description="Убирает реакцию на сообщение с определенной ролью"
+        description="Убрать привязку реакции к роли / Remove a reaction-role link"
     )
     @app_commands.describe(
-        message_id="ID сообщения за которым привязана реакция",
-        emoji="Реакция на сообщение, за которую выдается роль"
+        message_id="ID сообщения / Message ID",
+        emoji="Эмодзи реакции / Reaction emoji"
     )
     @app_commands.guild_only()
     @app_commands.default_permissions(manage_guild=True)
@@ -235,27 +236,27 @@ class ReactionRoles(commands.Cog):
             remove_emoji_on_message(message_id, emoji)
         except discord.NotFound:
             await interaction.response.send_message(
-                "Сообщение с таким ID не найдено в этом канале.", ephemeral=True
+                t(interaction.user.id, "message_not_found"), ephemeral=True
             )
             return
         except discord.Forbidden:
             await interaction.response.send_message(
-                "У бота нет доступа к этому каналу.", ephemeral=True
+                t(interaction.user.id, "bot_no_access"), ephemeral=True
             )
             return
         
         await message.remove_reaction(emoji)
         await interaction.response.send_message(
-            f"Реакция {emoji} успешно удалена!",
+            t(interaction.user.id, "reaction_removed", emoji=emoji),
             ephemeral=True
         )
 
     @app_commands.command(
         name="reaction_roles_remove_all",
-        description="Убирает реакции на сообщение с определенными ролями"
+        description="Убрать все привязки реакций сообщения / Remove all reaction-role links"
     )
     @app_commands.describe(
-        message_id="ID сообщения за которым привязаны реакции"
+        message_id="ID сообщения / Message ID"
     )
     @app_commands.guild_only()
     @app_commands.default_permissions(manage_guild=True)
@@ -270,18 +271,18 @@ class ReactionRoles(commands.Cog):
             remove_all_emoji_on_message(message_id)
         except discord.NotFound:
             await interaction.response.send_message(
-                "Сообщение с таким ID не найдено в этом канале.", ephemeral=True
+                t(interaction.user.id, "message_not_found"), ephemeral=True
             )
             return
         except discord.Forbidden:
             await interaction.response.send_message(
-                "У бота нет доступа к этому каналу.", ephemeral=True
+                t(interaction.user.id, "bot_no_access"), ephemeral=True
             )
             return
         
         await message.clear_reactions()
         await interaction.response.send_message(
-            f"Реакции успешно удалены!",
+            t(interaction.user.id, "reactions_removed"),
             ephemeral=True
         )
 

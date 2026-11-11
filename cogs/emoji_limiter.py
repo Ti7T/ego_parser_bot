@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+from localization import t
 
 from database import (
     set_emoji_limit,
@@ -174,10 +175,10 @@ class EmojiLimiter(commands.Cog):
 
     @app_commands.command(
         name="emoji_limit",
-        description="Устанавливает лимит реакций в текущем канале"
+        description="Установить лимит реакций / Set the channel reaction limit"
     )
     @app_commands.describe(
-        limit="Максимальное количество реакций от одного пользователя"
+        limit="Максимум реакций от пользователя / Maximum reactions per user"
     )
     @app_commands.checks.has_permissions(
         manage_guild=True
@@ -194,7 +195,7 @@ class EmojiLimiter(commands.Cog):
         )
 
         await interaction.response.send_message(
-            f"Лимит реакций установлен: **{limit}**.",
+            t(interaction.user.id, "emoji_limit_set", limit=limit),
             ephemeral=True
         )
 
@@ -204,7 +205,7 @@ class EmojiLimiter(commands.Cog):
 
     @app_commands.command(
         name="emoji_limit_remove",
-        description="Убирает лимит реакций в текущем канале"
+        description="Убрать лимит реакций / Remove the channel reaction limit"
     )
     @app_commands.checks.has_permissions(
         manage_guild=True
@@ -219,7 +220,7 @@ class EmojiLimiter(commands.Cog):
         )
 
         await interaction.response.send_message(
-            "Лимит реакций для этого канала убран.",
+            t(interaction.user.id, "emoji_limit_removed"),
             ephemeral=True
         )
 
@@ -229,10 +230,10 @@ class EmojiLimiter(commands.Cog):
 
     @app_commands.command(
         name="emoji_allow_user",
-        description="Разрешает пользователю ставить неограниченное количество реакций"
+        description="Разрешить пользователю неограниченные реакции / Exempt a user from the limit"
     )
     @app_commands.describe(
-        user="Пользователь"
+        user="Пользователь / User"
     )
     @app_commands.checks.has_permissions(
         manage_guild=True
@@ -248,7 +249,7 @@ class EmojiLimiter(commands.Cog):
         )
 
         await interaction.response.send_message(
-            f"{user.mention} добавлен в исключения.",
+            t(interaction.user.id, "user_allowed", user=user.mention),
             ephemeral=True
         )
 
@@ -258,7 +259,7 @@ class EmojiLimiter(commands.Cog):
 
     @app_commands.command(
         name="emoji_unallow_user",
-        description="Убирает пользователя из исключений"
+        description="Убрать пользователя из исключений / Remove a user exemption"
     )
     @app_commands.checks.has_permissions(
         manage_guild=True
@@ -274,7 +275,7 @@ class EmojiLimiter(commands.Cog):
         )
 
         await interaction.response.send_message(
-            f"{user.mention} убран из исключений.",
+            t(interaction.user.id, "user_unallowed", user=user.mention),
             ephemeral=True
         )
 
@@ -284,10 +285,10 @@ class EmojiLimiter(commands.Cog):
 
     @app_commands.command(
         name="emoji_allow_role",
-        description="Разрешает роли неограниченное количество реакций"
+        description="Разрешить роли неограниченные реакции / Exempt a role from the limit"
     )
     @app_commands.describe(
-        role="Роль"
+        role="Роль / Role"
     )
     @app_commands.checks.has_permissions(
         manage_guild=True
@@ -303,7 +304,7 @@ class EmojiLimiter(commands.Cog):
         )
 
         await interaction.response.send_message(
-            f"Роль {role.mention} добавлена в исключения.",
+            t(interaction.user.id, "role_allowed", role=role.mention),
             ephemeral=True
         )
 
@@ -313,7 +314,7 @@ class EmojiLimiter(commands.Cog):
 
     @app_commands.command(
         name="emoji_unallow_role",
-        description="Убирает роль из исключений"
+        description="Убрать роль из исключений / Remove a role exemption"
     )
     @app_commands.checks.has_permissions(
         manage_guild=True
@@ -329,7 +330,7 @@ class EmojiLimiter(commands.Cog):
         )
 
         await interaction.response.send_message(
-            f"Роль {role.mention} убрана из исключений.",
+            t(interaction.user.id, "role_unallowed", role=role.mention),
             ephemeral=True
         )
 

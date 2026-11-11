@@ -7,6 +7,7 @@ from models import Player
 from math import ceil
 from .player_service import make_player_header_data
 from .render_service import render_svg, svg_to_png
+from localization import TEXTS
 
 
 ACTIVITY_SQUARE_SIZE = 35
@@ -24,8 +25,8 @@ ACTIVITY_LEGEND = [
 TIME_TICK_MIN_DISTANCE = 100 / 850
 
 
-async def create_activity_graphs(player: Player) -> BytesIO:
-    data = await make_activity_graphs_data(player)
+async def create_activity_graphs(player: Player, language: str = "ru") -> BytesIO:
+    data = await make_activity_graphs_data(player, language)
     svg = render_svg("activity_graphs.svg", data)
     return svg_to_png(svg)
 
@@ -207,6 +208,7 @@ def create_activity_weeks(
 
 async def make_activity_graphs_data(
     player: Player,
+    language: str = "ru",
 ) -> dict[str, Any]:
     point_history, point_ticks, point_max = create_points_history(player)
     time_ticks = create_time_ticks(point_history)
@@ -217,12 +219,13 @@ async def make_activity_graphs_data(
     data = await make_player_header_data(player)
 
     data.update({
+        "labels": TEXTS.get(language, TEXTS["ru"]),
         "point_history": point_history,
         "point_ticks": point_ticks,
         "point_max": point_max,
         "time_ticks": time_ticks,
         "activity_weeks": activity_weeks,
-        "activity_days": ACTIVITY_DAYS,
+        "activity_days": TEXTS.get(language, TEXTS["ru"])["activity_days"],
         "activity_square": ACTIVITY_SQUARE_SIZE,
         "activity_step": ACTIVITY_STEP,
         "activity_legend": ACTIVITY_LEGEND,
