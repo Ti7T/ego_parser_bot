@@ -43,16 +43,14 @@ def get_linked_player(user_id: int) -> str | None:
     return row["nick"]
 
 
-def get_linked_players() -> str | None:
+def get_linked_players() -> list[str]:
     with get_connection() as connection:
-        row = connection.execute(
-            """
+        rows = connection.execute("""
             SELECT nick
             FROM linked_players
-            """
-        ).fetchall()
+        """).fetchall()
 
-    return row
+    return [row["nick"] for row in rows]
 
 
 def remove_linked_player(user_id: int) -> None:

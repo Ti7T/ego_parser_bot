@@ -4,7 +4,7 @@ from .database import get_connection
 
 def init_tables(connection : sqlite3.Connection) -> None:
     connection.executescript("""
-        CREATE TABLE player_snapshots (
+        CREATE TABLE IF NOT EXISTS player_snapshots (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nick TEXT NOT NULL,
             snapshot_date TEXT NOT NULL,
@@ -21,6 +21,8 @@ def save_snapshot(nick : str, snapshot_date : str, data : str) -> None:
             """
             INSERT INTO player_snapshots (nick, snapshot_date, data)
             VALUES (?, ?, ?)
+            ON CONFLICT(nick, snapshot_date)
+            DO UPDATE SET data = excluded.data;
             """,
             (nick, snapshot_date, data)
         )
