@@ -1,81 +1,63 @@
 import discord
 from models import Player
+from localization import TEXTS
 
-def create_profile_embed(player: Player) -> discord.Embed:
+
+def create_profile_embed(player: Player, language: str = "ru") -> discord.Embed:
+    text = TEXTS.get(language, TEXTS["ru"])
     embed = discord.Embed(
-        title=f"📊 Статистика игрока {player.nick}",
-        color=discord.Color.blue()
+        title=text["profile_title"].format(nick=player.nick),
+        color=discord.Color.blue(),
     )
-
+    embed.add_field(name=text["profile_player"], value=player.nick, inline=True)
     embed.add_field(
-        name="👤 Игрок",
-        value=player.nick,
-        inline=True
+        name=text["profile_clan"],
+        value=player.clan.name if player.clan else text["profile_none"],
+        inline=True,
     )
-
     embed.add_field(
-        name="🏰 Клан",
-        value=player.clan.name if player.clan else "Нет",
-        inline=True
-    )
-
-    embed.add_field(
-        name="⭐ Очки",
+        name=text["profile_points"],
         value=f"{player.points:,}".replace(",", " "),
-        inline=True
+        inline=True,
     )
-
     embed.add_field(
-        name="🗺️ Пройдено карт",
+        name=text["profile_maps"],
         value=str(player.total_finished_maps),
-        inline=True
+        inline=True,
     )
 
     counts = player.counts
-    counts_total = player.counts_total
-
+    totals = player.counts_total
     embed.add_field(
-        name="📈 Прогресс",
+        name=text["profile_progress"],
         value=(
-            f"🟢 Easy: **{counts.easy}/{counts_total.easy}**\n"
-            f"🔵 Main: **{counts.main}/{counts_total.main}**\n"
-            f"🟠 Hard: **{counts.hard}/{counts_total.hard}**\n"
-            f"🔴 Insane: **{counts.insane}/{counts_total.insane}**\n"
-            f"⚫ Extreme: **{counts.extreme}/{counts_total.extreme}**\n"
-            f"🟣 Solo: **{counts.solo}/{counts_total.solo}**\n"
-            f"🟡 Jet: **{counts.jet}/{counts_total.jet}**\n"
-            f"⚙️ Mods: **{counts.mods}/{counts_total.mods}**"
+            f"🟢 Easy: **{counts.easy}/{totals.easy}**\n"
+            f"🔵 Main: **{counts.main}/{totals.main}**\n"
+            f"🟠 Hard: **{counts.hard}/{totals.hard}**\n"
+            f"🔴 Insane: **{counts.insane}/{totals.insane}**\n"
+            f"⚫ Extreme: **{counts.extreme}/{totals.extreme}**\n"
+            f"🟣 Solo: **{counts.solo}/{totals.solo}**\n"
+            f"🟡 Jet: **{counts.jet}/{totals.jet}**\n"
+            f"⚙️ Mods: **{counts.mods}/{totals.mods}**"
         ),
-        inline=False
+        inline=False,
     )
 
     if player.best_teammates:
         embed.add_field(
-            name="🤝 Лучшие тиммейты",
-            value = "\n".join(
-                f"• {t.nickname} — {t.count} карт"
-                for t in player.best_teammates
+            name=text["profile_teammates"],
+            value="\n".join(
+                f"• {teammate.nickname} — "
+                f"{text['profile_maps_count'].format(count=teammate.count)}"
+                for teammate in player.best_teammates
             ),
-            inline=False
+            inline=False,
         )
 
-    completion = (
-        player.total_finished_maps /
-        (
-            counts_total.easy
-            + counts_total.main
-            + counts_total.hard
-            + counts_total.insane
-            + counts_total.extreme
-            + counts_total.solo
-            + counts_total.jet
-            + counts_total.mods
-        )
-        * 100
+    total_maps = sum(
+        getattr(totals, field)
+        for field in ("easy", "main", "hard", "insane", "extreme", "solo", "jet", "mods")
     )
-
-    embed.set_footer(
-        text=f"Общий прогресс: {completion:.1f}%"
-    )
-
+    completion = player.total_finished_maps / total_maps * 100 if total_maps else 0
+    embed.set_footer(text=text["profile_overall"].format(percent=completion))
     return embed

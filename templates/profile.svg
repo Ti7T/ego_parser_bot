@@ -133,19 +133,19 @@
     <!-- Очки и подпись (ниже) -->
     <text x="190" y="160" filter="url(#textShadow)">
       <tspan class="points">{{ points }}</tspan>
-      <tspan class="points-label" dx="12">POINTS</tspan>
+      <tspan class="points-label" dx="12">{{ labels.profile_points_label }}</tspan>
       
       <tspan class="playtime" dx="35">{{ playtime }}</tspan>
-      <tspan class="playtime-label" dx="12">HOURS</tspan>
+      <tspan class="playtime-label" dx="12">{{ labels.profile_hours_label }}</tspan>
     </text>
   {% else %}
     <!-- Без клана – точки на той же высоте, что и раньше -->
     <text x="190" y="120" filter="url(#textShadow)">
       <tspan class="points">{{ points }}</tspan>
-      <tspan class="points-label" dx="12">POINTS</tspan>
+      <tspan class="points-label" dx="12">{{ labels.profile_points_label }}</tspan>
       
       <tspan class="playtime" dx="35">{{ playtime }}</tspan>
-      <tspan class="playtime-label" dx="12">HOURS</tspan>
+      <tspan class="playtime-label" dx="12">{{ labels.profile_hours_label }}</tspan>
     </text>
   {% endif %}
 
@@ -178,8 +178,8 @@
   <!-- Разделитель -->
   <line x1="40" y1="500" x2="960" y2="500" stroke="#2d2d2d" stroke-width="1.5" />
 
-  <!-- Заголовок "Best teammates" -->
-  <text x="40" y="540" class="section-title">Best teammates</text>
+  <!-- Заголовок "{{ labels.profile_best_teammates }}" -->
+  <text x="40" y="540" class="section-title">{{ labels.profile_best_teammates }}</text>
 
   <!-- Тиммейты (первые 5) -->
   {% for tm in teammates[:5] %}
@@ -203,7 +203,7 @@
 
     <!-- Имя и количество карт -->
     <text x="{{ cx + offset + 12 }}" y="{{ cy - 6 }}" class="teammate-name">{{ tm.name }}</text>
-    <text x="{{ cx + offset + 12 }}" y="{{ cy + 20 }}" class="teammate-maps">{{ tm.maps }} maps</text>
+    <text x="{{ cx + offset + 12 }}" y="{{ cy + 20 }}" class="teammate-maps">{{ labels.profile_maps_count.format(count=tm.maps) }}</text>
   {% endfor %}
 
 </svg>

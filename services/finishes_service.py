@@ -3,16 +3,19 @@ from .player_service import make_player_header_data
 from .render_service import render_svg, svg_to_png
 from io import BytesIO
 from typing import Any
+from localization import TEXTS
 
 async def create_recent_finishes(
     player: Player,
+    language: str = "ru",
 ) -> BytesIO:
-    data = await make_recent_finishes_data(player)
+    data = await make_recent_finishes_data(player, language)
     svg = render_svg("recent_finishes.svg", data)
     return svg_to_png(svg)
 
 async def make_recent_finishes_data(
     player: Player,
+    language: str = "ru",
 ) -> dict[str, Any]:
 
     finishes = []
@@ -34,6 +37,7 @@ async def make_recent_finishes_data(
     data = await make_player_header_data(player)
 
     data.update({
+        "labels": TEXTS.get(language, TEXTS["ru"]),
         "playtime": round(player.total_playtime / 3600, 1),
         "finishes": finishes
     })
