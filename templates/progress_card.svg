@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1110" viewBox="0 0 1000 1110">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b1c22"/><stop offset="1" stop-color="#101114"/></linearGradient>
+  <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff5963"/><stop offset="1" stop-color="#bd3447"/></linearGradient>
+  <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff5963"/><stop offset="1" stop-color="#e38a72"/></linearGradient>
+  <clipPath id="avatarClip"><rect x="40" y="40" width="120" height="120" rx="20"/></clipPath>
+  <clipPath id="mainClip"><rect x="42" y="190" width="916" height="226" rx="20"/></clipPath>
+  <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000" flood-opacity=".28"/></filter>
+</defs>
+<style>
+  text{font-family:Inter,'Noto Sans',sans-serif}
+  .nick{font-size:44px;font-weight:800;fill:#fff;letter-spacing:-.02em}
+  .rank{font-size:26px;font-weight:700;fill:#ff4d57;letter-spacing:.02em}
+  .eyebrow{font-size:13px;font-weight:700;fill:#ff4d57;letter-spacing:.16em}
+  .heading{font-size:27px;font-weight:800;fill:#fff;letter-spacing:-.4px}
+  .muted{font-size:14px;font-weight:500;fill:#999}
+  .card{fill:#191b21;stroke:#30333c;stroke-width:1.2}
+  .label{font-size:15px;font-weight:700;fill:#aeb2bb}
+  .value{font-size:30px;font-weight:800;fill:#fff;letter-spacing:-.4px}
+  .old{font-size:27px;font-weight:800;fill:#858b96}
+  .small{font-size:12px;font-weight:600;fill:#7f8590}
+  .delta{font-size:17px;font-weight:800}
+  .pos{fill:#75c99b}.neg{fill:#e17b84}.neutral{fill:#aeb2bb}
+  .trend{font-size:23px;font-weight:900}
+  .trend.pos{fill:#75c99b}.trend.neg{fill:#e17b84}.trend.neutral{fill:#aeb2bb}
+  .divider{stroke:#30333b;stroke-width:1}
+</style>
+<rect x="10" y="10" width="980" height="1090" rx="26" fill="url(#bg)" stroke="#30323a" stroke-width="1.5"/>
+
+<!-- Header from progress_card_arrows -->
+<rect x="40" y="40" width="120" height="120" rx="20" fill="#242730"/>
+{% if avatar_url is defined and avatar_url %}
+<image x="40" y="40" width="120" height="120" href="{{ avatar_url }}" xlink:href="{{ avatar_url }}" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)"/>
+{% else %}
+<g clip-path="url(#avatarClip)"><text x="100" y="113" text-anchor="middle" font-size="28" font-weight="800" fill="#777d88">{{ avatar_initial|default('?') }}</text></g>
+{% endif %}
+<rect x="40" y="40" width="120" height="120" rx="20" fill="none" stroke="#ff4d57" stroke-width="2.5"/>
+<text x="190" y="80"><tspan class="nick">{{ nickname|default('ExamplePlayer') }}</tspan><tspan class="rank" dx="18">#{{ rank|default('128') }}</tspan></text>
+<text x="190" y="120"><tspan font-size="32" font-weight="800" fill="#ff4d57">{{ total_score|default('12 540') }}</tspan><tspan font-size="20" font-weight="600" fill="#999" dx="12" letter-spacing="1.6">{{ text_overall_score|default('ОБЩИЙ СЧЁТ') }}</tspan></text>
+<text x="960" y="55" text-anchor="end" class="eyebrow">{{ text_player_progress|default('ПРОГРЕСС ИГРОКА') }}</text>
+<text x="960" y="91" text-anchor="end" class="heading">{{ period_title|default('За последние 30 дней') }}</text>
+<text x="960" y="119" text-anchor="end" class="muted">{{ period_dates|default('13 окт. — 12 нояб.') }}</text>
+
+<!-- Main card: v4 layout -->
+<rect x="42" y="190" width="916" height="226" rx="20" class="card" filter="url(#shadow)"/>
+<g clip-path="url(#mainClip)"><rect x="42" y="190" width="7" height="226" fill="url(#accent)"/></g>
+<text x="74" y="229" class="eyebrow">{{ text_main_result|default('ГЛАВНЫЙ РЕЗУЛЬТАТ') }}</text>
+<text x="74" y="260" font-size="17" font-weight="700" fill="#d8dae0">{{ text_points_earned|default('Получено очков') }}</text>
+{% set main_class = main_delta_class|default('pos') %}
+{% set main_arrow = '↑' if main_class == 'pos' else ('↓' if main_class == 'neg' else '→') %}
+<text x="74" y="331" font-size="53" font-weight="800" fill="#fff" letter-spacing="-1.5">{{ current_points|default('1 251') }}<tspan dx="12" class="trend {{ main_class }}">{{ main_arrow }}</tspan></text>
+<text x="76" y="360" class="muted">{{ text_current_period|default('Текущий период') }}</text>
+<line x1="330" y1="278" x2="330" y2="367" class="divider"/>
+<text x="370" y="328" class="old" font-size="40">{{ previous_points|default('1 100') }}</text>
+<text x="372" y="359" class="muted">{{ text_previous_period|default('Предыдущий период') }}</text>
+<rect x="730" y="252" width="190" height="88" rx="16" fill="#202a28" stroke="#345348" stroke-width="1"/>
+<text x="825" y="290" text-anchor="middle" font-size="29" font-weight="800" class="{{ main_class }}">{{ main_delta|default('+150') }}</text>
+<text x="825" y="316" text-anchor="middle" class="small" fill="#8ebba4">{{ text_vs_previous|default('К ПРЕДЫДУЩЕМУ') }}</text>
+<rect x="74" y="389" width="846" height="6" rx="3" fill="#30333b"/>
+<rect x="74" y="389" width="{{ progress_width|default(566) }}" height="6" rx="3" fill="url(#bar)"/>
+
+<!-- Period metrics: arrow after the current value -->
+<text x="42" y="468" class="eyebrow">{{ text_period_metrics|default('ПОКАЗАТЕЛИ ЗА ПЕРИОД') }}</text>
+<g>
+ <rect x="42" y="489" width="444" height="118" rx="17" class="card"/>
+ <text x="66" y="520" class="label">{{ text_points|default('Очки') }}</text>
+ {% set points_class = points_delta_class|default('pos') %}{% set points_arrow = '↑' if points_class == 'pos' else ('↓' if points_class == 'neg' else '→') %}
+ <text x="66" y="563" class="value">{{ points_now|default('1 251') }}<tspan dx="9" class="trend {{ points_class }}">{{ points_arrow }}</tspan></text>
+ <text x="66" y="586" class="small">{{ text_before_prefix|default('Было:') }} <tspan fill="#a4a9b2">{{ points_before|default('1 100') }}</tspan></text>
+ <rect x="365" y="516" width="94" height="34" rx="17" fill="{{ '#20312b' if points_class == 'pos' else ('#342327' if points_class == 'neg' else '#292c33') }}"/><text x="412" y="539" text-anchor="middle" class="delta {{ points_class }}">{{ points_delta|default('+150') }}</text>
+ <text x="459" y="579" text-anchor="end" class="small">{{ points_hint|default('Больше очков') }}</text>
+</g>
+<g>
+ <rect x="514" y="489" width="444" height="118" rx="17" class="card"/>
+ <text x="538" y="520" class="label">{{ text_maps|default('Карты') }}</text>
+ {% set maps_class = maps_delta_class|default('pos') %}{% set maps_arrow = '↑' if maps_class == 'pos' else ('↓' if maps_class == 'neg' else '→') %}
+ <text x="538" y="563" class="value">{{ maps_now|default('18') }}<tspan dx="9" class="trend {{ maps_class }}">{{ maps_arrow }}</tspan></text>
+ <text x="538" y="586" class="small">{{ text_before_prefix|default('Было:') }} <tspan fill="#a4a9b2">{{ maps_before|default('12') }}</tspan></text>
+ <rect x="837" y="516" width="94" height="34" rx="17" fill="{{ '#20312b' if maps_class == 'pos' else ('#342327' if maps_class == 'neg' else '#292c33') }}"/><text x="884" y="539" text-anchor="middle" class="delta {{ maps_class }}">{{ maps_delta|default('+6') }}</text>
+ <text x="931" y="579" text-anchor="end" class="small">{{ maps_hint|default('Больше карт') }}</text>
+</g>
+<g>
+ <rect x="42" y="623" width="444" height="118" rx="17" class="card"/>
+ <text x="66" y="654" class="label">{{ text_finishes|default('Прохождения') }}</text>
+ {% set clears_class = clears_delta_class|default('neg') %}{% set clears_arrow = '↑' if clears_class == 'pos' else ('↓' if clears_class == 'neg' else '→') %}
+ <text x="66" y="697" class="value">{{ clears_now|default('32') }}<tspan dx="9" class="trend {{ clears_class }}">{{ clears_arrow }}</tspan></text>
+ <text x="66" y="720" class="small">{{ text_before_prefix|default('Было:') }} <tspan fill="#a4a9b2">{{ clears_before|default('40') }}</tspan></text>
+ <rect x="365" y="650" width="94" height="34" rx="17" fill="{{ '#20312b' if clears_class == 'pos' else ('#342327' if clears_class == 'neg' else '#292c33') }}"/><text x="412" y="673" text-anchor="middle" class="delta {{ clears_class }}">{{ clears_delta|default('−8') }}</text>
+ <text x="459" y="713" text-anchor="end" class="small">{{ clears_hint|default('Меньше прохождений') }}</text>
+</g>
+<g>
+ <rect x="514" y="623" width="444" height="118" rx="17" class="card"/>
+ <text x="538" y="654" class="label">{{ text_rank|default('Место в рейтинге') }}</text>
+ {% set rank_class = rank_delta_class|default('pos') %}{% set rank_arrow = '↑' if rank_class == 'pos' else ('↓' if rank_class == 'neg' else '→') %}
+ <text x="538" y="698" font-size="29" font-weight="800"><tspan fill="#858b96">#{{ rank_before|default('141') }}</tspan><tspan dx="12" class="trend {{ rank_class }}">{{ rank_arrow }}</tspan><tspan dx="12" fill="#fff">#{{ rank_now|default('128') }}</tspan></text>
+ <text x="538" y="722" class="small">{{ text_was|default('БЫЛО') }}</text><text x="650" y="722" class="small">{{ text_now|default('СТАЛО') }}</text>
+ <rect x="837" y="650" width="94" height="34" rx="17" fill="{{ '#20312b' if rank_class == 'pos' else ('#342327' if rank_class == 'neg' else '#292c33') }}"/><text x="884" y="673" text-anchor="middle" class="delta {{ rank_class }}">{{ rank_delta|default('+13') }}</text>
+ <text x="931" y="713" text-anchor="end" class="small">{{ rank_hint|default('Поднялся в рейтинге') }}</text>
+</g>
+
+<!-- Overall stats: left-aligned sequence; each item follows the previous one -->
+<text x="42" y="794" class="eyebrow">{{ text_overall_metrics|default('ОБЩИЕ ПОКАЗАТЕЛИ') }}</text>
+<g>
+ <rect x="42" y="815" width="444" height="126" rx="17" class="card"/>
+ <text x="66" y="847" class="label">{{ text_points_all_time|default('Очки за всё время') }}</text>
+ {% set lifetime_points_arrow_x = 66 + (lifetime_points_before|default('11 300')|string|length) * 16.5 + 14 %}
+ {% set lifetime_points_now_x = lifetime_points_arrow_x + 42 %}
+ <text x="66" y="898" class="old">{{ lifetime_points_before|default('11 300') }}</text><text x="{{ lifetime_points_arrow_x }}" y="898" class="trend pos">→</text><text x="{{ lifetime_points_now_x }}" y="898" class="value">{{ lifetime_points_now|default('12 541') }}</text>
+ <text x="66" y="922" class="small">{{ text_was|default('БЫЛО') }}</text><text x="{{ lifetime_points_now_x }}" y="922" class="small">{{ text_now|default('СТАЛО') }}</text>
+ <text x="458" y="850" text-anchor="end" class="delta pos">{{ lifetime_points_delta|default('+1 240') }}</text>
+</g>
+<g>
+ <rect x="514" y="815" width="444" height="126" rx="17" class="card"/>
+ <text x="538" y="847" class="label">{{ text_maps_all_time|default('Карты за всё время') }}</text>
+ {% set lifetime_maps_arrow_x = 538 + (lifetime_maps_before|default('341')|string|length) * 16.5 + 14 %}
+ {% set lifetime_maps_now_x = lifetime_maps_arrow_x + 42 %}
+ <text x="538" y="898" class="old">{{ lifetime_maps_before|default('341') }}</text><text x="{{ lifetime_maps_arrow_x }}" y="898" class="trend pos">→</text><text x="{{ lifetime_maps_now_x }}" y="898" class="value">{{ lifetime_maps_now|default('358') }}</text>
+ <text x="538" y="922" class="small">{{ text_was|default('БЫЛО') }}</text><text x="{{ lifetime_maps_now_x }}" y="922" class="small">{{ text_now|default('СТАЛО') }}</text>
+ <text x="930" y="850" text-anchor="end" class="delta pos">{{ lifetime_maps_delta|default('+17') }}</text>
+</g>
+
+<text x="42" y="1000" class="small">{{ text_period_comparison|default('Изменения показаны относительно предыдущего периода') }}</text>
+<rect x="42" y="1021" width="916" height="1" fill="#30333b"/>
+<text x="42" y="1054" font-size="12" font-weight="700" fill="#696f7a" letter-spacing="1">{{ text_brand|default('EGO PLAYER STATISTICS') }}</text>
+<text x="958" y="1054" text-anchor="end" class="small">{{ footer_note|default('Данные для примера') }}</text>
+</svg>

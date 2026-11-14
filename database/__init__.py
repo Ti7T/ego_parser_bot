@@ -1,6 +1,9 @@
 from .init import init_database
 
-from .snapshots import save_snapshot
+from .snapshots import (
+    save_snapshot,
+    get_snapshot
+)
 
 from .reaction_roles import (
     get_emoji_role,

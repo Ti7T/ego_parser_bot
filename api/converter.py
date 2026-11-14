@@ -74,3 +74,34 @@ class JSONConverter:
                 for record in data.get("records", [])
             ],
         )
+
+    @staticmethod
+    def from_snapshot(data: dict) -> Player:
+        return Player(
+            nick=data["nick"],
+            clan=Clan(**data["clan"]) if data["clan"] else None,
+            points=data["points"],
+            rank=data["rank"],
+            total_finished_maps=data["total_finished_maps"],
+            avatar_url=data["avatar_url"],
+
+            counts=DifficultyCounter(**data["counts"]),
+            counts_total=DifficultyCounter(**data["counts_total"]),
+
+            best_teammates=[
+                Teammate(**teammate)
+                for teammate in data["best_teammates"]
+            ],
+
+            total_playtime=data["total_playtime"],
+
+            activity_records=[
+                ActivityRecord(**record)
+                for record in data["activity_records"]
+            ],
+
+            point_history=[
+                ActivityRecord(**record)
+                for record in data["point_history"]
+            ],
+        )
