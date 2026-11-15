@@ -36,8 +36,8 @@
 <g clip-path="url(#avatarClip)"><text x="100" y="113" text-anchor="middle" font-size="28" font-weight="800" fill="#777d88">{{ avatar_initial|default('?') }}</text></g>
 {% endif %}
 <rect x="40" y="40" width="120" height="120" rx="20" fill="none" stroke="#ff4d57" stroke-width="2.5"/>
-<text x="190" y="80"><tspan class="nick">{{ nickname|default('ExamplePlayer') }}</tspan><tspan class="rank" dx="18">#{{ rank|default('128') }}</tspan></text>
-<text x="190" y="120"><tspan font-size="32" font-weight="800" fill="#ff4d57">{{ total_score|default('12 540') }}</tspan><tspan font-size="20" font-weight="600" fill="#999" dx="12" letter-spacing="1.6">{{ text_overall_score|default('ОБЩИЙ СЧЁТ') }}</tspan></text>
+<text x="190" y="80"><tspan class="nick">{{ nick }}</tspan><tspan class="rank" dx="18">#{{ rank }}</tspan></text>
+<text x="190" y="120"><tspan font-size="32" font-weight="800" fill="#ff4d57">{{ points }}</tspan><tspan font-size="20" font-weight="600" fill="#999" dx="12" letter-spacing="1.6">{{ text_overall_score|default('ОБЩИЙ СЧЁТ') }}</tspan></text>
 <text x="960" y="55" text-anchor="end" class="eyebrow">{{ text_player_progress|default('ПРОГРЕСС ИГРОКА') }}</text>
 <text x="960" y="91" text-anchor="end" class="heading">{{ period_title|default('За последние 30 дней') }}</text>
 <text x="960" y="119" text-anchor="end" class="muted">{{ period_dates|default('13 окт. — 12 нояб.') }}</text>

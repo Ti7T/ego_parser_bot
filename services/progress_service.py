@@ -1,4 +1,4 @@
-from models import Player
+from models import Player, ProgressMetrics
 from typing import Any
 from .render_service import render_svg, svg_to_png
 from .player_service import make_player_header_data
@@ -8,12 +8,14 @@ from zoneinfo import ZoneInfo
 
 async def create_progress_card(
     previous_player: Player,
+    middle_player: Player,
     current_player: Player,
     days: int,
     language: str = "ru",
 ):
     data = await make_progress_card_data(
         previous_player,
+        middle_player,
         current_player,
         days,
         language,
@@ -64,15 +66,48 @@ def get_total_maps(player: Player) -> int:
     )
 
 
+
+def calculate_period_delta(
+    before: Player,
+    after: Player,
+) -> ProgressMetrics:
+    return ProgressMetrics(
+        points=after.points - before.points,
+        maps=get_total_maps(after) - get_total_maps(before),
+        finishes=after.total_finished_maps - before.total_finished_maps,
+        # Положительное значение означает улучшение места.
+        rank=before.rank - after.rank,
+    )
+
+
+def calculate_progress_dynamics(
+    previous_player: Player,
+    middle_player: Player,
+    current_player: Player,
+) -> tuple[ProgressMetrics, ProgressMetrics]:
+    previous_dynamic = calculate_period_delta(
+        previous_player,
+        middle_player,
+    )
+    current_dynamic = calculate_period_delta(
+        middle_player,
+        current_player,
+    )
+
+    return previous_dynamic, current_dynamic
+
+
+
 async def make_progress_card_data(
     previous_player: Player,
+    middle_player: Player,
     current_player: Player,
     days: int,
     language: str = "ru",
 ) -> dict[str, Any]:
     labels = TEXTS.get(language, TEXTS["ru"])
 
-    now = datetime.now(ZoneInfo("Europe/Amsterdam")).date()
+    now = datetime.now(ZoneInfo("Europe/Moscow")).date()
     start_date = now - timedelta(days=days)
 
     period_dates = labels["progress_period_dates"].format(
@@ -80,7 +115,34 @@ async def make_progress_card_data(
         end_date=now.strftime("%d.%m.%Y"),
     )
 
-    # Общие показатели
+    previous_dynamic, current_dynamic = calculate_progress_dynamics(
+        previous_player,
+        middle_player,
+        current_player,
+    )
+
+    # Изменение динамики между периодами
+    points_delta, points_class = get_delta(
+        previous_dynamic.points,
+        current_dynamic.points,
+    )
+
+    maps_delta, maps_class = get_delta(
+        previous_dynamic.maps,
+        current_dynamic.maps,
+    )
+
+    finishes_delta, finishes_class = get_delta(
+        previous_dynamic.finishes,
+        current_dynamic.finishes,
+    )
+
+    rank_delta, rank_class = get_delta(
+        previous_dynamic.rank,
+        current_dynamic.rank,
+    )
+
+    # Общие показатели за весь промежуток
     previous_points = previous_player.points
     current_points = current_player.points
 
@@ -93,54 +155,31 @@ async def make_progress_card_data(
     previous_rank = previous_player.rank
     current_rank = current_player.rank
 
-    # Изменения
-    points_delta, points_class = get_delta(
-        previous_points, current_points
-    )
-    maps_delta, maps_class = get_delta(
-        previous_maps, current_maps
-    )
-    finishes_delta, finishes_class = get_delta(
-        previous_finishes, current_finishes
-    )
-
-    # Для рейтинга уменьшение номера места — улучшение.
-    rank_delta, rank_class = get_delta(
-        previous_rank, current_rank, reverse=True
-    )
-
-    # Главный результат — изменение очков.
-    main_delta, main_class = get_delta(
-        previous_points, current_points
-    )
-
     data = await make_player_header_data(current_player)
 
     data.update({
         "avatar_initial": current_player.nick[:1].upper(),
 
-        # Главный результат
-        "current_points": format_number(
-            current_points - previous_points
-        ),
-        "previous_points": format_number(previous_points),
-        "main_delta": main_delta,
-        "main_delta_class": main_class,
+        # Главный результат — прирост очков за текущий период
+        "current_points": format_number(current_dynamic.points),
+        "previous_points": format_number(previous_dynamic.points),
+        "main_delta": points_delta,
+        "main_delta_class": points_class,
         "progress_width": 566,
 
-        # Показатели за период
-        "points_now": format_number(current_points),
-        "points_before": format_number(previous_points),
+        # Показатели за периоды
+        "points_now": format_number(current_dynamic.points),
+        "points_before": format_number(previous_dynamic.points),
         "points_delta": points_delta,
         "points_delta_class": points_class,
 
-        "maps_now": format_number(current_maps),
-        "maps_before": format_number(previous_maps),
+        "maps_now": format_number(current_dynamic.maps),
+        "maps_before": format_number(previous_dynamic.maps),
         "maps_delta": maps_delta,
         "maps_delta_class": maps_class,
 
-        "clears_now": format_number(current_finishes),
-        "clears_before": format_number(previous_finishes),
+        "clears_now": format_number(current_dynamic.finishes),
+        "clears_before": format_number(previous_dynamic.finishes),
         "clears_delta": finishes_delta,
         "clears_delta_class": finishes_class,
 
@@ -152,11 +191,15 @@ async def make_progress_card_data(
         # Общие показатели
         "lifetime_points_before": format_number(previous_points),
         "lifetime_points_now": format_number(current_points),
-        "lifetime_points_delta": points_delta,
+        "lifetime_points_delta": format_number(
+            current_points - previous_points
+        ),
 
         "lifetime_maps_before": format_number(previous_maps),
         "lifetime_maps_now": format_number(current_maps),
-        "lifetime_maps_delta": maps_delta,
+        "lifetime_maps_delta": format_number(
+            current_maps - previous_maps
+        ),
 
         # Локализация
         "text_overall_score": labels["progress_overall_score"],
@@ -189,10 +232,10 @@ async def make_progress_card_data(
         "footer_note": labels["progress_footer"],
 
         # Подсказки
-        "points_hint": labels["progress_points_hint"],
-        "maps_hint": labels["progress_maps_hint"],
-        "clears_hint": labels["progress_finishes_hint"],
-        "rank_hint": labels["progress_rank_hint"],
+        "points_hint": labels[f"progress_points_hint_{points_class}"],
+        "maps_hint": labels[f"progress_maps_hint_{maps_class}"],
+        "clears_hint": labels[f"progress_finishes_hint_{finishes_class}"],
+        "rank_hint": labels[f"progress_rank_hint_{rank_class}"],
     })
 
     return data

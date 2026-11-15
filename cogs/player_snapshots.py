@@ -15,7 +15,7 @@ class PlayerSnapshotsCog(commands.Cog):
         self.daily_player_snapshot.cancel()
 
     @tasks.loop(
-        time=time(hour=3, minute=0, tzinfo=ZoneInfo("Europe/Amsterdam"))
+        time=time(hour=3, minute=0, tzinfo=ZoneInfo("Europe/Moscow"))
     )
     async def daily_player_snapshot(self):
         await save_linked_players()

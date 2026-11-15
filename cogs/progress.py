@@ -8,7 +8,7 @@ from database import get_snapshot
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from api import JSONConverter
-from config import BASE_URL
+from localization import TEXTS
 import json
 
 class ProgressCog(commands.Cog):
@@ -17,36 +17,72 @@ class ProgressCog(commands.Cog):
 
     @app_commands.command(
         name="progress",
-        description="Показать статистику игрока на EGO серверах / Show EGO player statistics",
+        description="Статистика игрока за период / Player statistics over a period",
     )
     @app_commands.describe(
-        days="Ник игрока на EGO / EGO player nickname",
+        days="Количество дней для сравнения / Number of days to compare",
         member="Discord-пользователь с привязанным через /link ником / Discord user linked with /link",
     )
-    async def profile(
+    async def progress(
         self,
         interaction: discord.Interaction,
         days: app_commands.Range[int, 1, 365] = 1,
-        member: discord.Member | None = None
+        member: discord.Member | None = None,
     ):
-        nick = await resolve_nick_argument(nick=None, member=member, interaction=interaction)
+        language = get_language(interaction.user.id)
+        labels = TEXTS.get(language, TEXTS["ru"])
+
+        nick = await resolve_nick_argument(
+            nick=None,
+            member=member,
+            interaction=interaction,
+        )
         if nick is None:
             return
 
-        target_date = (
-            datetime.now(ZoneInfo("Europe/Moscow"))
-            - timedelta(days=days)
-        ).date()
-
         await interaction.response.defer(thinking=True)
+
+        today = datetime.now(ZoneInfo("Europe/Amsterdam")).date()
+
+        previous_date = (today - timedelta(days=days * 2)).isoformat()
+        middle_date = (today - timedelta(days=days)).isoformat()
+
+        previous_snapshot = get_snapshot(nick, previous_date)
+        middle_snapshot = get_snapshot(nick, middle_date)
+
+        if not previous_snapshot or not middle_snapshot:
+            await interaction.followup.send(
+                labels["progress_snapshot_not_found"].format(
+                    previous_date=previous_date,
+                    middle_date=middle_date,
+                )
+            )
+            return
+
         current_player = await get_player(nick)
-        previous_player_str = get_snapshot(nick, target_date)
-        if not previous_player_str:
-            await interaction.followup.send("error")
-        previous_player_json = json.loads(previous_player_str)
-        previous_player = JSONConverter.from_snapshot(previous_player_json)
-        image = await create_progress_card(previous_player, current_player, days, get_language(interaction.user.id))
-        file = discord.File(fp=image, filename="profile.png")
+
+        if current_player is None:
+            await interaction.followup.send(
+                labels["player_not_found"]
+            )
+            return
+
+        previous_player = JSONConverter.from_snapshot(
+            json.loads(previous_snapshot)
+        )
+        middle_player = JSONConverter.from_snapshot(
+            json.loads(middle_snapshot)
+        )
+
+        image = await create_progress_card(
+            previous_player,
+            middle_player,
+            current_player,
+            days,
+            language,
+        )
+
+        file = discord.File(fp=image, filename="progress.png")
         await interaction.followup.send(file=file)
 
 

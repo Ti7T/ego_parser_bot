@@ -11,7 +11,7 @@ from .exceptions import PlayerNotFoundError
 async def save_linked_players():
     linked_players = get_linked_players()
 
-    now = datetime.now(ZoneInfo("Europe/Amsterdam"))
+    now = datetime.now(ZoneInfo("Europe/Moscow"))
     snapshot_date = (now - timedelta(days=1)).date().isoformat()
 
     for nick in linked_players:
