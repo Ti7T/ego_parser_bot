@@ -1,4 +1,4 @@
-from models import DifficultyCounter, Player, Clan, Teammate, ActivityRecord
+from models import DifficultyCounter, Player, Clan, Teammate, ActivityRecord, FireStats
 
 from urllib.parse import urlparse
 
@@ -73,6 +73,15 @@ class JSONConverter:
                 JSONConverter._to_activity_record(record)
                 for record in data.get("records", [])
             ],
+        )
+
+    @staticmethod
+    def to_fireStats(data : dict) -> FireStats:
+        return FireStats(
+            current=data["current"],
+            best=data["best"],
+            done_today=data["done_today"],
+            badge=data["badge"]
         )
 
     @staticmethod

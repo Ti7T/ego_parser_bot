@@ -1,5 +1,10 @@
 from .init import init_database
 
+from .fire_history import (
+    set_fire_history,
+    get_fire_history
+)
+
 from .snapshots import (
     save_snapshot,
     get_snapshot

@@ -10,6 +10,9 @@ async def get_player_json(nick: str) -> dict | None:
 async def get_player_playtime_json(nick: str) -> dict | None:
     return await parse_url(APIEndpoints.PLAYTIME_BY_NICK.format(nick=nick))
 
+async def get_player_fire_json(nick: str) -> dict | None:
+    return await parse_url(APIEndpoints.FIRE_BY_NICK.format(nick=nick))
+
 async def parse_url(endpoint: str) -> dict | None:
     try:
         session = client.http_session
