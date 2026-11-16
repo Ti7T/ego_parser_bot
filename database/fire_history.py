@@ -79,3 +79,19 @@ def get_fire_history(nick: str, game_date: str) -> dict | None:
         "done_today": bool(row["done_today"]),
         "badge": bool(row["badge"])
     }
+
+
+def get_fire_dates(nick: str, start_date: str, end_date: str) -> set[str]:
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT game_date
+            FROM fire_history
+            WHERE nick = ?
+              AND game_date BETWEEN ? AND ?
+              AND done_today = 1
+            """,
+            (nick, start_date, end_date)
+        ).fetchall()
+
+    return {row["game_date"] for row in rows}

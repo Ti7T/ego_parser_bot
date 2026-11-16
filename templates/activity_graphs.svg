@@ -14,6 +14,9 @@
       <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.32"/>
     </filter>
     <clipPath id="avatarClip"><rect x="40" y="40" width="120" height="120" rx="20"/></clipPath>
+    <symbol id="fireIcon" viewBox="0 0 24 24">
+      <path d="M13.5 1.2c.5 3.8-1.4 5.5-3.1 7.3-1.3 1.3-2 2.6-1.7 4.3-1.7-.9-2.4-2.5-2.2-4.3C3.8 11 3 13.2 3 15.5 3 20 6.6 23 12 23s9-3.2 9-7.8c0-4.6-3.1-8.7-7.5-14zM12 20c-2 0-3.5-1.3-3.5-3.2 0-1.5.9-2.5 2.2-3.9.9-1 1.6-2 1.9-3.3 1.9 2.2 3.4 4.3 3.4 6.8 0 2-1.6 3.6-4 3.6z"/>
+    </symbol>
   </defs>
 
   <style>
@@ -160,11 +163,32 @@
       {% elif day.count <= 5 %}{% set level = 2 %}
       {% else %}{% set level = 3 %}{% endif %}
       <rect x="{{ wx }}" y="{{ grid_y + loop.index0 * step }}" width="{{ square }}" height="{{ square }}" rx="7" class="activity-square activity-{{ level }}"/>
+      {% if day.fire %}
+      <use href="#fireIcon" xlink:href="#fireIcon"
+          x="{{ wx + 10 }}"
+          y="{{ grid_y + loop.index0 * step + 7 }}"
+          width="15" height="21"
+          fill="#ffc15c"
+          stroke="#6a431c"
+          stroke-width="0.5"/>
+    {% endif %}
     {% endfor %}
   {% endfor %}
 
   {% set legend_x = grid_x %}
   {% set legend_y = grid_y + 7 * step + 25 %}
+  {% set fire_legend_x = legend_x + 86 + (activity_legend|length * 58) + 8 %}
+
+  <use href="#fireIcon" xlink:href="#fireIcon"
+      x="{{ fire_legend_x }}" y="{{ legend_y - 12 }}"
+      width="13" height="18"
+      fill="#ffc15c"
+      stroke="#6a431c"
+      stroke-width="0.5"/>
+
+  <text x="{{ fire_legend_x + 20 }}"
+        y="{{ legend_y + 5 }}"
+        class="legend-label">{{ labels.activity_fire }}</text>
   <text x="{{ legend_x }}" y="{{ legend_y }}" class="legend-label">{{ labels.activity_per_day }}</text>
   {% for value in activity_legend %}
     {% set lx = legend_x + 86 + loop.index0 * 58 %}

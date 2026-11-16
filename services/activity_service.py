@@ -8,7 +8,8 @@ from math import ceil
 from .player_service import make_player_header_data
 from .render_service import render_svg, svg_to_png
 from localization import TEXTS
-
+from zoneinfo import ZoneInfo
+from database import get_fire_dates
 
 ACTIVITY_SQUARE_SIZE = 35
 ACTIVITY_STEP = 40
@@ -164,19 +165,30 @@ def create_activity_counter(player: Player) -> Counter[str]:
         unique_records[key] = record
 
     activity_counter: Counter[str] = Counter()
+    moscow_tz = ZoneInfo("Europe/Moscow")
 
     for record in unique_records.values():
-        activity_counter[record.finished_at[:10]] += 1
+        finished_at = datetime.fromisoformat(record.finished_at)
+
+        if finished_at.tzinfo is None:
+            finished_at = finished_at.replace(tzinfo=timezone.utc)
+
+        game_date = (
+            finished_at.astimezone(moscow_tz) - timedelta(hours=3)
+        ).date().isoformat()
+
+        activity_counter[game_date] += 1
 
     return activity_counter
 
 
 def create_activity_weeks(
     activity_counter: Counter[str],
+    fire_dates: set[str] | None = None,
 ) -> list[dict[str, Any]]:
-    latest_date = datetime.now().date()
+    moscow_tz = ZoneInfo("Europe/Moscow")
+    latest_date = (datetime.now(moscow_tz) - timedelta(hours=3)).date()
 
-    # Week ends on Sunday.
     days_until_sunday = 6 - latest_date.weekday()
     end_date = latest_date + timedelta(days=days_until_sunday)
     start_date = end_date - timedelta(weeks=20, days=6)
@@ -194,6 +206,7 @@ def create_activity_weeks(
             days.append({
                 "date": date_key,
                 "count": activity_counter.get(date_key, 0),
+                "fire": date_key in (fire_dates or set()),
             })
 
         activity_weeks.append({
@@ -205,7 +218,6 @@ def create_activity_weeks(
 
     return activity_weeks
 
-
 async def make_activity_graphs_data(
     player: Player,
     language: str = "ru",
@@ -215,6 +227,16 @@ async def make_activity_graphs_data(
 
     activity_counter = create_activity_counter(player)
     activity_weeks = create_activity_weeks(activity_counter)
+
+    if activity_weeks:
+        start_date = activity_weeks[0]["days"][0]["date"]
+        end_date = activity_weeks[-1]["days"][-1]["date"]
+
+        fire_dates = get_fire_dates(player.nick, start_date, end_date)
+
+        for week in activity_weeks:
+            for day in week["days"]:
+                day["fire"] = day["date"] in fire_dates
 
     data = await make_player_header_data(player)
 

@@ -118,6 +118,7 @@ TEXTS = {
             "Не удалось найти необходимые снимки статистики игрока.\n"
             "Необходимы снимки за {previous_date}, {middle_date} и {current_date}."
         ),
+        "activity_fire": "огонёк сохранён",
     },
     "en": {
         "language_title": "🌐 Bot language",
@@ -231,6 +232,7 @@ TEXTS = {
             "Could not find the required player statistics snapshots.\n"
             "Snapshots for {previous_date}, {middle_date} and {current_date} are required."
         ),
+        "activity_fire": "streak saved",
     },
 }
 
