@@ -26,3 +26,17 @@ def save_snapshot(nick : str, snapshot_date : str, data : str) -> None:
             """,
             (nick, snapshot_date, data)
         )
+
+
+def get_snapshot(nick : str, snapshot_date : str) -> str | None:
+    with get_connection() as connection:
+        row = connection.execute(
+            """
+            SELECT data FROM player_snapshots 
+            WHERE nick = ? AND snapshot_date = ?
+            LIMIT 1
+            """,
+            (nick, snapshot_date)
+        ).fetchone()
+
+    return row[0] if row else None

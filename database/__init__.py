@@ -1,6 +1,15 @@
 from .init import init_database
 
-from .snapshots import save_snapshot
+from .fire_history import (
+    set_fire_history,
+    get_fire_history,
+    get_fire_dates
+)
+
+from .snapshots import (
+    save_snapshot,
+    get_snapshot
+)
 
 from .reaction_roles import (
     get_emoji_role,
@@ -19,6 +28,7 @@ from .link_players import (
     set_linked_player,
     get_linked_player,
     get_linked_players,
+    get_linked_players_with_ids,
     remove_linked_player
 )
 
