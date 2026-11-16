@@ -116,7 +116,7 @@ TEXTS = {
         "progress_rank_hint_neutral": "Без изменений",
         "progress_snapshot_not_found": (
             "Не удалось найти необходимые снимки статистики игрока.\n"
-            "Необходимы снимки за {previous_date} и {middle_date}."
+            "Необходимы снимки за {previous_date}, {middle_date} и {current_date}."
         ),
     },
     "en": {
@@ -229,7 +229,7 @@ TEXTS = {
         "progress_rank_hint_neutral": "No change",
         "progress_snapshot_not_found": (
             "Could not find the required player statistics snapshots.\n"
-            "Snapshots for {previous_date} and {middle_date} are required."
+            "Snapshots for {previous_date}, {middle_date} and {current_date} are required."
         ),
     },
 }

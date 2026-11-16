@@ -42,28 +42,23 @@ class ProgressCog(commands.Cog):
 
         await interaction.response.defer(thinking=True)
 
-        today = datetime.now(ZoneInfo("Europe/Amsterdam")).date()
+        today = datetime.now(ZoneInfo("Europe/Moscow")).date()
 
-        previous_date = (today - timedelta(days=days * 2)).isoformat()
-        middle_date = (today - timedelta(days=days)).isoformat()
+        previous_date = (today - timedelta(days=days * 3)).isoformat()
+        middle_date = (today - timedelta(days=days * 2)).isoformat()
+        current_date = (today - timedelta(days=days)).isoformat()
 
         previous_snapshot = get_snapshot(nick, previous_date)
         middle_snapshot = get_snapshot(nick, middle_date)
+        current_snapshot = get_snapshot(nick, current_date)
 
-        if not previous_snapshot or not middle_snapshot:
+        if not previous_snapshot or not middle_snapshot or not current_snapshot:
             await interaction.followup.send(
                 labels["progress_snapshot_not_found"].format(
                     previous_date=previous_date,
                     middle_date=middle_date,
+                    current_date=current_date
                 )
-            )
-            return
-
-        current_player = await get_player(nick)
-
-        if current_player is None:
-            await interaction.followup.send(
-                labels["player_not_found"]
             )
             return
 
@@ -72,6 +67,9 @@ class ProgressCog(commands.Cog):
         )
         middle_player = JSONConverter.from_snapshot(
             json.loads(middle_snapshot)
+        )
+        current_player = JSONConverter.from_snapshot(
+            json.loads(current_snapshot)
         )
 
         image = await create_progress_card(
